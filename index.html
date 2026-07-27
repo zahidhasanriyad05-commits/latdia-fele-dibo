@@ -6,58 +6,109 @@
 <title>Navbar Generator — Bootstrap Navbar Builder</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
   :root{
     --panel-bg:#ffffff;
-    --page-bg:#eef1f6;
-    --ink:#1c2430;
-    --muted:#667085;
-    --accent:#3457d5;
-    --line:#e2e6ee;
+    --page-bg:#f3f5f9;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --accent:#4338ca;
+    --accent-dark:#362d99;
+    --accent-soft:#eef0fd;
+    --line:#e4e7ee;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+    --shadow-md:0 4px 14px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+    --shadow-lg:0 16px 40px rgba(16,24,40,.12);
+    --radius:16px;
   }
+  *{ box-sizing:border-box; }
   body{
-    background:var(--page-bg);
+    background:
+      radial-gradient(1100px 420px at 15% -8%, rgba(67,56,202,.06), transparent 60%),
+      var(--page-bg);
     color:var(--ink);
-    font-family:"Segoe UI", system-ui, sans-serif;
+    font-family:"Inter", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
   .builder-shell{
     max-width:1400px;
     margin:0 auto;
-    padding:28px 20px 60px;
+    padding:32px 22px 70px;
+  }
+  .app-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:26px;
+  }
+  .app-icon-badge{
+    width:46px;
+    height:46px;
+    border-radius:13px;
+    background:linear-gradient(155deg, var(--accent), var(--accent-dark));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.3rem;
+    box-shadow:0 6px 16px rgba(67,56,202,.28);
+    flex-shrink:0;
   }
   .app-title{
-    font-weight:700;
-    letter-spacing:.2px;
+    font-weight:800;
+    font-size:1.5rem;
+    letter-spacing:-.01em;
+    line-height:1.2;
   }
   .app-sub{
     color:var(--muted);
-    font-size:.95rem;
+    font-size:.92rem;
+    margin-top:1px;
   }
   .panel{
     background:var(--panel-bg);
     border:1px solid var(--line);
-    border-radius:14px;
-    padding:20px;
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .15s ease;
   }
   .panel-title{
     font-weight:700;
-    font-size:1.02rem;
-    margin-bottom:14px;
+    font-size:.98rem;
+    letter-spacing:-.005em;
+    margin-bottom:16px;
     display:flex;
     align-items:center;
-    gap:8px;
+    gap:9px;
+    color:var(--ink);
   }
-  .panel-title .bi{ color:var(--accent); }
+  .panel-title .bi{
+    color:var(--accent);
+    background:var(--accent-soft);
+    width:28px;
+    height:28px;
+    border-radius:8px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.95rem;
+  }
 
   .menu-card{
     border:1px solid var(--line);
-    border-radius:10px;
+    border-radius:12px;
     margin-bottom:10px;
-    background:#fbfcfe;
+    background:#fff;
     overflow:hidden;
-    transition:box-shadow .12s ease, opacity .12s ease;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .15s ease, opacity .12s ease, border-color .15s ease;
   }
+  .menu-card:hover{ box-shadow:var(--shadow-md); border-color:#d5d9e3; }
   .menu-card.dragging{ opacity:.4; }
   .menu-card.drop-target{ box-shadow:0 0 0 2px var(--accent) inset; }
   .menu-card-header{
@@ -90,16 +141,17 @@
     flex-shrink:0;
   }
   .menu-card-header .chip{
-    font-size:.72rem;
-    padding:2px 8px;
+    font-size:.7rem;
+    font-weight:600;
+    padding:2px 9px;
     border-radius:999px;
-    background:#e7ecfd;
+    background:var(--accent-soft);
     color:var(--accent);
   }
   .menu-card-body{
-    padding:0 14px 14px;
+    padding:0 16px 16px;
     border-top:1px solid var(--line);
-    padding-top:14px;
+    padding-top:16px;
   }
   .menu-card-body.hidden{ display:none; }
   .chevron{
@@ -107,28 +159,73 @@
     color:var(--muted);
   }
   .chevron.open{ transform:rotate(180deg); }
+  .menu-card.has-dropdown .menu-card-header{
+    border-left:3px solid var(--accent);
+  }
+  .dropdown-editor{
+    margin-top:10px;
+    padding:14px 14px 8px;
+    border-radius:10px;
+    background:#f8f9fd;
+    border:1px solid var(--line);
+  }
+  .samelink-note{
+    font-size:.76rem;
+    color:var(--muted);
+    margin-top:4px;
+    margin-bottom:8px;
+  }
   .drop-item-row{
+    position:relative;
     display:flex;
     gap:8px;
     align-items:center;
     margin-bottom:6px;
+    padding-left:16px;
+  }
+  .drop-item-row::before{
+    content:"";
+    position:absolute;
+    left:2px;
+    top:50%;
+    width:8px;
+    height:1px;
+    background:var(--muted);
+    opacity:.6;
+  }
+  .drop-item-row.locked .drop-link{
+    background:#eef1f6;
+    color:var(--muted);
   }
   .form-label-sm{
-    font-size:.8rem;
+    font-size:.78rem;
     font-weight:600;
     color:var(--muted);
-    margin-bottom:4px;
+    margin-bottom:5px;
+    letter-spacing:.01em;
   }
+  .form-control, .form-select{
+    border-color:var(--line);
+    font-size:.88rem;
+  }
+  .form-control:focus, .form-select:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .btn{ font-weight:600; font-size:.86rem; }
   .btn-accent{
     background:var(--accent);
     border-color:var(--accent);
     color:#fff;
+    box-shadow:0 2px 6px rgba(67,56,202,.22);
   }
   .btn-accent:hover{
-    background:#2941ab;
-    border-color:#2941ab;
+    background:var(--accent-dark);
+    border-color:var(--accent-dark);
     color:#fff;
   }
+  .btn-outline-secondary{ border-color:var(--line); color:var(--ink); }
+  .btn-outline-secondary:hover{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
 
   .reorder-btns{
     display:flex;
@@ -150,7 +247,7 @@
     font-size:.7rem;
   }
   .reorder-btns button:hover:not(:disabled){
-    background:#e7ecfd;
+    background:var(--accent-soft);
     color:var(--accent);
     border-color:var(--accent);
   }
@@ -160,13 +257,13 @@
   }
 
   .preview-panel{
-    margin-bottom:24px;
+    margin-bottom:26px;
     position:sticky;
     top:16px;
     z-index:50;
   }
   .preview-panel.is-stuck .preview-frame{
-    box-shadow:0 10px 30px rgba(20,30,60,.14);
+    box-shadow:var(--shadow-lg);
   }
   .preview-panel-header{
     display:flex;
@@ -175,16 +272,55 @@
     margin-bottom:14px;
   }
   .preview-frame{
-    border:1px dashed var(--line);
-    border-radius:12px;
-    padding:20px;
-    background:repeating-conic-gradient(#f4f6fa 0% 25%, #eef1f6 0% 50%) 50% / 20px 20px;
+    border-radius:16px;
+    padding:22px;
+    min-height:auto;
+    background:
+      radial-gradient(600px 200px at 10% 0%, rgba(67,56,202,.05), transparent 65%),
+      #e9ecf3;
     transition:box-shadow .15s ease;
   }
-  .preview-inner{
-    border-radius:8px;
+  .browser-frame{
+    border-radius:14px;
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-md);
+  }
+  .browser-chrome{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 16px;
+    background:#eef0f4;
+    border-bottom:1px solid var(--line);
+    border-radius:14px 14px 0 0;
+  }
+  .browser-dots{ display:flex; gap:6px; flex-shrink:0; }
+  .browser-dot{ width:10px; height:10px; border-radius:50%; }
+  .browser-dot.red{ background:#ec6a5e; }
+  .browser-dot.yellow{ background:#f4bf50; }
+  .browser-dot.green{ background:#61c454; }
+  .browser-address{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:5px 12px;
+    font-size:.78rem;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:7px;
     overflow:hidden;
-    box-shadow:0 6px 24px rgba(20,30,60,.08);
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+  .browser-address .bi{ font-size:.72rem; color:#94a3b8; }
+  .preview-inner{
+    border-radius:0 0 14px 14px;
+    overflow:visible;
+    box-shadow:none;
+    min-height:150px;
   }
   /* Fullscreen preview mode */
   #previewMount:fullscreen{
@@ -198,16 +334,18 @@
     width:100%;
   }
   .code-box{
-    background:#10141c;
+    background:#0b0f19;
     color:#d7e1ff;
-    border-radius:10px;
+    border-radius:12px;
     padding:16px;
-    font-family:"Fira Code", monospace;
-    font-size:.82rem;
+    font-family:"JetBrains Mono", "Fira Code", monospace;
+    font-size:.8rem;
+    line-height:1.55;
     max-height:420px;
     overflow:auto;
     white-space:pre-wrap;
     word-break:break-word;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
   }
   .icon-picker-grid{
     display:grid;
@@ -223,14 +361,16 @@
   .icon-picker-grid button{
     border:1px solid transparent;
     background:#f4f6fa;
-    border-radius:6px;
+    border-radius:7px;
     padding:6px 0;
     font-size:1.05rem;
     color:var(--ink);
+    transition:background .12s ease, color .12s ease;
   }
+  .icon-picker-grid button:hover{ background:var(--accent-soft); }
   .icon-picker-grid button.selected{
     border-color:var(--accent);
-    background:#e7ecfd;
+    background:var(--accent-soft);
     color:var(--accent);
   }
   .swatch-row{
@@ -239,22 +379,28 @@
     flex-wrap:wrap;
   }
   .swatch{
-    width:30px;height:30px;border-radius:8px;border:2px solid transparent;cursor:pointer;
+    width:30px;height:30px;border-radius:9px;border:2px solid transparent;cursor:pointer;
+    box-shadow:inset 0 0 0 1px rgba(16,24,40,.06);
+    transition:transform .1s ease;
   }
-  .swatch.selected{ border-color:#1c2430; }
+  .swatch:hover{ transform:translateY(-1px); }
+  .swatch.selected{ border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft); }
   .small-note{
     font-size:.78rem;
     color:var(--muted);
+    line-height:1.5;
   }
   .copy-toast{
     position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#1c2430;
+    bottom:22px;
+    right:22px;
+    background:var(--ink);
     color:#fff;
-    padding:10px 16px;
-    border-radius:8px;
-    font-size:.9rem;
+    padding:11px 18px;
+    border-radius:10px;
+    font-size:.88rem;
+    font-weight:500;
+    box-shadow:var(--shadow-lg);
     display:none;
     z-index:2000;
   }
@@ -263,19 +409,24 @@
     justify-content:space-between;
     align-items:center;
     border:1px solid var(--line);
-    border-radius:8px;
-    padding:8px 12px;
+    border-radius:10px;
+    padding:10px 14px;
     margin-bottom:8px;
     background:#fbfcfe;
+    transition:box-shadow .12s ease;
   }
+  .page-download-row:hover{ box-shadow:var(--shadow-sm); }
 </style>
 </head>
 <body>
 
 <div class="builder-shell">
-  <div class="mb-4">
-    <div class="app-title fs-3"><i class="bi bi-layout-text-sidebar-reverse"></i> Navbar Generator</div>
-    <div class="app-sub">Build a custom Bootstrap navbar — menus, dropdowns, icons, colors, all customizable.</div>
+  <div class="app-header">
+    <div class="app-icon-badge"><i class="bi bi-layout-text-sidebar-reverse"></i></div>
+    <div>
+      <div class="app-title">Navbar Generator</div>
+      <div class="app-sub">Build a custom Bootstrap navbar — menus, dropdowns, icons, colors, all customizable.</div>
+    </div>
   </div>
 
   <!-- FULL-WIDTH LIVE PREVIEW -->
@@ -285,7 +436,17 @@
       <button class="btn btn-outline-secondary btn-sm" id="fullscreenBtn"><i class="bi bi-arrows-fullscreen"></i> Fullscreen</button>
     </div>
     <div class="preview-frame">
-      <div class="preview-inner" id="previewMount"></div>
+      <div class="browser-frame">
+        <div class="browser-chrome">
+          <div class="browser-dots">
+            <span class="browser-dot red"></span>
+            <span class="browser-dot yellow"></span>
+            <span class="browser-dot green"></span>
+          </div>
+          <div class="browser-address"><i class="bi bi-lock-fill"></i><span id="browserAddressText">yoursite.com</span></div>
+        </div>
+        <div class="preview-inner" id="previewMount"></div>
+      </div>
     </div>
     <div class="small-note mt-2">This preview stays fixed on screen while you scroll through the settings below. Use Fullscreen to preview at real page width.</div>
   </div>
@@ -296,37 +457,57 @@
 
       <div class="panel mb-4">
         <div class="panel-title"><i class="bi bi-textarea-t"></i> Brand / Logo</div>
-        <div class="row g-2 mb-2">
-          <div class="col-6">
-            <div class="form-label-sm">Main Text</div>
-            <input type="text" class="form-control form-control-sm" id="brandMain" value="My">
-          </div>
-          <div class="col-6">
-            <div class="form-label-sm">Accent Text (optional)</div>
-            <input type="text" class="form-control form-control-sm" id="brandAccent" value="Website">
+
+        <div class="mb-2">
+          <div class="form-label-sm">Brand Link (where the logo goes)</div>
+          <input type="text" class="form-control form-control-sm" id="brandLink" value="index.html" placeholder="#">
+        </div>
+
+        <div class="border rounded p-2 mb-2" style="border-color:var(--line)!important; background:#fbfcfe;">
+          <div class="form-label-sm mb-2">Main Text (left side)</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-5">
+              <input type="text" class="form-control form-control-sm" id="brandMain" value="My">
+            </div>
+            <div class="col-3">
+              <input type="color" class="form-control form-control-color form-control-sm w-100" id="brandMainColor" value="#1c2430" title="Main text color">
+            </div>
+            <div class="col-4 d-flex gap-2 justify-content-end">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandMainBold" checked>
+                <label class="form-check-label small">Bold</label>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandMainItalic">
+                <label class="form-check-label small">Italic</label>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="row g-2 mb-2">
-          <div class="col-8">
-            <div class="form-label-sm">Brand Link (where the logo goes)</div>
-            <input type="text" class="form-control form-control-sm" id="brandLink" value="index.html" placeholder="#">
-          </div>
-          <div class="col-4">
-            <div class="form-label-sm">Accent Color</div>
-            <input type="color" class="form-control form-control-color form-control-sm w-100" id="brandAccentColor" value="#dc3545">
+
+        <div class="border rounded p-2 mb-2" style="border-color:var(--line)!important; background:#fbfcfe;">
+          <div class="form-label-sm mb-2">Accent Text (right side, optional)</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-5">
+              <input type="text" class="form-control form-control-sm" id="brandAccent" value="Website">
+            </div>
+            <div class="col-3">
+              <input type="color" class="form-control form-control-color form-control-sm w-100" id="brandAccentColor" value="#dc3545" title="Accent text color">
+            </div>
+            <div class="col-4 d-flex gap-2 justify-content-end">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandAccentBold" checked>
+                <label class="form-check-label small">Bold</label>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandAccentItalic">
+                <label class="form-check-label small">Italic</label>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="d-flex gap-3">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="brandBold" checked>
-            <label class="form-check-label small">Bold</label>
-          </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="brandItalic">
-            <label class="form-check-label small">Italic</label>
-          </div>
-        </div>
-        <div class="small-note mt-2">Leave "Accent Text" blank for a single, uncolored logo.</div>
+
+        <div class="small-note mt-1">Leave "Accent Text" blank for a single, uncolored logo. Each side has its own color and bold/italic style.</div>
       </div>
 
       <div class="panel mb-4">
@@ -385,6 +566,7 @@
             <option value="btn-outline-danger">Outline Danger</option>
             <option value="btn-outline-dark">Outline Dark</option>
           </select>
+          <div class="small-note mt-2">The button's link also gets its own downloadable page below.</div>
         </div>
       </div>
 
@@ -513,7 +695,7 @@
   const QUICK_PAGES = ["Home","About","Services","Portfolio","Blog","Team","Pricing","Gallery","Products","FAQ","Testimonials","Contact"];
 
   function slugify(str){
-    return String(str).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-+|-+$)/g, "");
+    return String(str).trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/(^_+|_+$)/g, "");
   }
 
   function autoLink(label){
@@ -527,13 +709,13 @@
   function cryptoId(){ return "id" + Math.random().toString(36).slice(2,9); }
 
   let menuItems = [
-    { id: cryptoId(), label: "Home", link: "index.html", active: true, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false },
-    { id: cryptoId(), label: "About", link: "about.html", active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false },
+    { id: cryptoId(), label: "Home", link: "index.html", active: true, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" },
+    { id: cryptoId(), label: "About", link: "about.html", active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" },
     { id: cryptoId(), label: "Services", link: "services.html", active: false, disabled: false, icon: "", hasDropdown: true, dropdown: [
-        { id: cryptoId(), label: "Web Design", link:"web-design.html" },
+        { id: cryptoId(), label: "Web Design", link:"web_design.html" },
         { id: cryptoId(), label: "SEO", link:"seo.html" }
-      ], linkTouched: false, open: false },
-    { id: cryptoId(), label: "Contact", link: "contact.html", active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false },
+      ], linkTouched: false, open: false, sameLinkForAll: true, sharedLink: "services.html" },
+    { id: cryptoId(), label: "Contact", link: "contact.html", active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" },
   ];
 
   let selectedBg = "#f8f9fa";
@@ -549,8 +731,11 @@
   const brandAccentEl = document.getElementById("brandAccent");
   const brandLinkEl = document.getElementById("brandLink");
   const brandAccentColorEl = document.getElementById("brandAccentColor");
-  const brandBoldEl = document.getElementById("brandBold");
-  const brandItalicEl = document.getElementById("brandItalic");
+  const brandMainColorEl = document.getElementById("brandMainColor");
+  const brandMainBoldEl = document.getElementById("brandMainBold");
+  const brandMainItalicEl = document.getElementById("brandMainItalic");
+  const brandAccentBoldEl = document.getElementById("brandAccentBold");
+  const brandAccentItalicEl = document.getElementById("brandAccentItalic");
   const rightWidgetTypeEl = document.getElementById("rightWidgetType");
   const buttonFieldsEl = document.getElementById("buttonFields");
   const btnTextEl = document.getElementById("btnText");
@@ -611,7 +796,7 @@
     menuListEl.innerHTML = "";
     menuItems.forEach((item, idx) => {
       const card = document.createElement("div");
-      card.className = "menu-card";
+      card.className = "menu-card" + (item.hasDropdown ? " has-dropdown" : "");
       card.dataset.index = idx;
       const title = item.label || "Untitled";
       card.innerHTML = `
@@ -667,6 +852,15 @@
             </div>
           </div>
           <div class="dropdown-editor" data-id="${item.id}" style="${item.hasDropdown ? '' : 'display:none;'}">
+            <div class="form-check form-switch mb-1">
+              <input class="form-check-input menu-samelink" type="checkbox" role="switch" data-id="${item.id}" ${item.sameLinkForAll ? "checked":""}>
+              <label class="form-check-label small">All submenu items open the same page</label>
+            </div>
+            <div class="mb-2 samelink-field" data-id="${item.id}" style="${item.sameLinkForAll ? '' : 'display:none;'}">
+              <div class="form-label-sm">Shared Page Link</div>
+              <input type="text" class="form-control form-control-sm menu-sharedlink" data-id="${item.id}" value="${escapeHtml(item.sharedLink || autoLink(item.label))}" placeholder="#">
+              <div class="samelink-note">Every submenu item below will link here, and only one page will be created for it.</div>
+            </div>
             <div class="form-label-sm mb-1">Dropdown Items</div>
             <div class="dropdown-items-wrap" data-id="${item.id}"></div>
             <button class="btn btn-sm btn-outline-secondary add-dropdown-item mt-1" data-id="${item.id}"><i class="bi bi-plus"></i> Add Dropdown Item</button>
@@ -758,6 +952,11 @@
         if (it.hasDropdown && it.dropdown.length === 0){
           it.dropdown.push({id: cryptoId(), label:"Action", link:"#"});
         }
+        if (it.hasDropdown && it.sharedLink === ""){
+          // On by default — most dropdowns land on one page; the user can switch it off.
+          it.sameLinkForAll = true;
+          it.sharedLink = autoLink(it.label);
+        }
       });
       renderMenuList(); renderAll();
     }));
@@ -774,6 +973,27 @@
       updateItem(id, it => it.dropdown.push({id: cryptoId(), label:"New Item", link:"#"}));
       renderMenuList(); renderAll();
     }));
+    document.querySelectorAll(".menu-samelink").forEach(inp => inp.addEventListener("change", e => {
+      e.stopPropagation();
+      const id = e.target.dataset.id;
+      updateItem(id, it => {
+        it.sameLinkForAll = e.target.checked;
+        if (it.sameLinkForAll && !it.sharedLink){
+          it.sharedLink = autoLink(it.label);
+        }
+      });
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".menu-sharedlink").forEach(inp => {
+      inp.addEventListener("click", e => e.stopPropagation());
+      inp.addEventListener("input", e => {
+        updateItem(e.target.dataset.id, it => it.sharedLink = e.target.value || "#");
+        const wrap = document.querySelector(`.dropdown-items-wrap[data-id="${e.target.dataset.id}"]`);
+        if (wrap){
+          wrap.querySelectorAll(".drop-link").forEach(el => el.value = e.target.value || "#");
+        }
+      });
+    });
 
     attachDragEvents();
   }
@@ -823,10 +1043,11 @@
   function renderDropdownItems(item){
     const wrap = document.querySelector(`.dropdown-items-wrap[data-id="${item.id}"]`);
     if (!wrap) return;
+    const locked = !!item.sameLinkForAll;
     wrap.innerHTML = item.dropdown.map(d => `
-      <div class="drop-item-row">
+      <div class="drop-item-row${locked ? ' locked' : ''}">
         <input type="text" class="form-control form-control-sm drop-label" data-parent="${item.id}" data-id="${d.id}" value="${escapeHtml(d.label)}" placeholder="Item name">
-        <input type="text" class="form-control form-control-sm drop-link" data-parent="${item.id}" data-id="${d.id}" value="${escapeHtml(d.link)}" placeholder="#">
+        <input type="text" class="form-control form-control-sm drop-link" data-parent="${item.id}" data-id="${d.id}" value="${escapeHtml(locked ? (item.sharedLink || '#') : d.link)}" placeholder="#" ${locked ? "disabled title=\"Using the shared page link above\"" : ""}>
         <button class="btn btn-sm btn-outline-danger drop-remove" data-parent="${item.id}" data-id="${d.id}"><i class="bi bi-x"></i></button>
       </div>
     `).join("");
@@ -872,15 +1093,18 @@
     const main = brandMainEl.value;
     const accent = brandAccentEl.value.trim();
     const link = brandLinkEl.value.trim() || "#";
-    const classes = [brandBoldEl.checked ? "fw-bold" : "", brandItalicEl.checked ? "fst-italic" : ""].filter(Boolean).join(" ");
-    const classAttr = classes ? ` class="${classes}"` : "";
-    let inner;
+
+    const mainClasses = [brandMainBoldEl.checked ? "fw-bold" : "", brandMainItalicEl.checked ? "fst-italic" : ""].filter(Boolean).join(" ");
+    const mainClassAttr = mainClasses ? ` class="${mainClasses}"` : "";
+    const mainSpan = `<span${mainClassAttr} style="color: ${brandMainColorEl.value};">${escapeHtml(main) || "Brand"}</span>`;
+
+    let accentSpan = "";
     if (accent){
-      inner = `<span${classAttr}>${escapeHtml(main)}<span style="color: ${brandAccentColorEl.value};">${escapeHtml(accent)}</span></span>`;
-    } else {
-      inner = `<span${classAttr}>${escapeHtml(main) || "Brand"}</span>`;
+      const accentClasses = [brandAccentBoldEl.checked ? "fw-bold" : "", brandAccentItalicEl.checked ? "fst-italic" : ""].filter(Boolean).join(" ");
+      const accentClassAttr = accentClasses ? ` class="${accentClasses}"` : "";
+      accentSpan = `<span${accentClassAttr} style="color: ${brandAccentColorEl.value};">${escapeHtml(accent)}</span>`;
     }
-    return `<a class="navbar-brand" href="${escapeHtml(link)}">${inner}</a>`;
+    return `<a class="navbar-brand" href="${escapeHtml(link)}">${mainSpan}${accentSpan}</a>`;
   }
 
   // Builds the <li> menu items. If activeOverrideId is provided, that item
@@ -891,7 +1115,7 @@
       const iconHtml = item.icon ? `<i class="bi ${item.icon} me-1"></i>` : "";
       if (item.hasDropdown){
         const dropItems = item.dropdown.map(d =>
-          `          <li><a class="dropdown-item" href="${escapeHtml(d.link)}">${escapeHtml(d.label)}</a></li>`
+          `          <li><a class="dropdown-item" href="${escapeHtml(item.sameLinkForAll ? (item.sharedLink || '#') : d.link)}">${escapeHtml(d.label)}</a></li>`
         ).join("\n");
         return `        <li class="nav-item dropdown">
           <a class="nav-link fw-bold dropdown-toggle${isActive ? " active" : ""}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"${isActive ? ' aria-current="page"' : ""}>
@@ -961,16 +1185,28 @@ ${menuHtml}
 
   function getAllPages(){
     // Flattens menu items into a list of real, linkable pages.
-    // Dropdown parents (href="#") aren't pages themselves — their children are.
+    // Dropdown parents (href="#") aren't pages themselves — their children are,
+    // unless "same link for all" is on, in which case the dropdown becomes one page.
     let pages = [];
     menuItems.forEach(item => {
       if (item.disabled) return;
       if (item.hasDropdown){
-        item.dropdown.forEach(d => pages.push({ label: d.label, link: d.link, activeMenuId: item.id }));
+        if (item.sameLinkForAll){
+          pages.push({ label: item.label, link: item.sharedLink || autoLink(item.label), activeMenuId: item.id });
+        } else {
+          item.dropdown.forEach(d => pages.push({ label: d.label, link: d.link, activeMenuId: item.id }));
+        }
       } else {
         pages.push({ label: item.label, link: item.link, activeMenuId: item.id });
       }
     });
+    // Right-side button widget: give its link a downloadable page too, if it points somewhere real
+    if (rightWidgetTypeEl.value === "button"){
+      const btnLink = btnLinkEl.value.trim();
+      if (btnLink && btnLink !== "#" && !pages.some(p => p.link === btnLink)){
+        pages.push({ label: btnTextEl.value.trim() || "Button Page", link: btnLink, activeMenuId: null });
+      }
+    }
     return pages;
   }
 
@@ -1162,12 +1398,17 @@ ${footerHtml}
     previewMount.innerHTML = html;
     codeOutput.textContent = html;
     renderDownloadPagesList();
+    const addrEl = document.getElementById("browserAddressText");
+    if (addrEl){
+      const link = brandLinkEl.value.trim();
+      addrEl.textContent = (!link || link === "#" || link === "index.html") ? "yoursite.com" : "yoursite.com/" + link.replace(/^#\/?/, "");
+    }
   }
 
   document.getElementById("addMenuBtn").addEventListener("click", () => {
     const label = "New Page";
     const id = cryptoId();
-    menuItems.push({ id, label, link: autoLink(label), active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false });
+    menuItems.push({ id, label, link: autoLink(label), active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" });
     openOnly(id); // auto-open the newly added menu, collapse the rest
     renderMenuList(); renderAll();
   });
@@ -1181,7 +1422,7 @@ ${footerHtml}
       btn.textContent = name;
       btn.addEventListener("click", () => {
         const id = cryptoId();
-        menuItems.push({ id, label: name, link: autoLink(name), active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false });
+        menuItems.push({ id, label: name, link: autoLink(name), active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" });
         openOnly(id); // auto-open the newly added menu, collapse the rest
         renderMenuList(); renderAll();
       });
@@ -1204,8 +1445,11 @@ ${footerHtml}
   brandAccentEl.addEventListener("input", renderAll);
   brandLinkEl.addEventListener("input", renderAll);
   brandAccentColorEl.addEventListener("input", renderAll);
-  brandBoldEl.addEventListener("change", renderAll);
-  brandItalicEl.addEventListener("change", renderAll);
+  brandMainColorEl.addEventListener("input", renderAll);
+  brandMainBoldEl.addEventListener("change", renderAll);
+  brandMainItalicEl.addEventListener("change", renderAll);
+  brandAccentBoldEl.addEventListener("change", renderAll);
+  brandAccentItalicEl.addEventListener("change", renderAll);
   rightWidgetTypeEl.addEventListener("change", () => {
     buttonFieldsEl.style.display = rightWidgetTypeEl.value === "button" ? "block" : "none";
     renderAll();
