@@ -646,6 +646,7 @@
           <div class="form-label-sm">Copyright Text</div>
           <input type="text" class="form-control form-control-sm" id="footerCopyright" value="© 2026 My Website. All rights reserved.">
         </div>
+        <div class="small-note mt-2"><i class="bi bi-magic"></i> The footer's background and text color now follow the Background Color you pick above — headings pick up your logo's accent color.</div>
       </div>
 
     </div>
@@ -1297,8 +1298,17 @@ ${socialHtml}
   function buildFooterHtml(pages){
     const about = footerAboutTextEl.value.trim() || "Lorem ipsum dolor sit amet.";
     const copyright = footerCopyrightEl.value.trim() || "© 2026 My Website. All rights reserved.";
+
+    // Follow the same background/theme chosen for the navbar, so the footer matches instead of always being black
+    const bg = customBgEl.value;
+    const theme = navThemeEl.value; // "light" background -> dark text, "dark" background -> light text
+    const textColor = theme === "dark" ? "#f1f3f5" : "#212529";
+    const mutedTextColor = theme === "dark" ? "#c7cbd1" : "#495057";
+    const headingColor = brandAccentColorEl.value;
+    const dividerColor = theme === "dark" ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.1)";
+
     const quickLinks = pages.slice(0, 6).map(p =>
-      `        <a class="text-light text-decoration-none" href="${escapeHtml(p.link)}">${escapeHtml(p.label)}</a>`
+      `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="${escapeHtml(p.link)}">${escapeHtml(p.label)}</a>`
     ).join("\n");
 
     const socialList = [];
@@ -1307,29 +1317,29 @@ ${socialHtml}
     if (socialLinkedinEl.checked) socialList.push(["LinkedIn","bi-linkedin"]);
     if (socialYoutubeEl.checked) socialList.push(["YouTube","bi-youtube"]);
     const socialLinksHtml = socialList.map(([name, ic]) =>
-      `        <a class="text-light text-decoration-none" href="#"><i class="bi ${ic} me-1"></i>${name}</a>`
+      `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="#"><i class="bi ${ic} me-1"></i>${name}</a>`
     ).join("\n");
 
-    return `  <div class="big-footer bg-black py-5">
+    return `  <div class="big-footer py-5" style="background-color:${bg};">
     <div class="container d-flex justify-content-around flex-wrap gap-4">
       <div>
-        <h4 class="text-warning">About Us</h4>
-        <p class="text-light" style="max-width:280px;">${escapeHtml(about)}</p>
+        <h4 style="color:${headingColor};">About Us</h4>
+        <p style="max-width:280px; color:${textColor};">${escapeHtml(about)}</p>
       </div>
       <div class="d-flex flex-column">
-        <h4 class="text-warning">Quick Links</h4>
+        <h4 style="color:${headingColor};">Quick Links</h4>
 ${quickLinks}
       </div>
       <div class="d-flex flex-column gap-1">
-        <h4 class="text-warning">Follow Us</h4>
+        <h4 style="color:${headingColor};">Follow Us</h4>
 ${socialLinksHtml}
       </div>
     </div>
   </div>
 
   <div class="mew-footer">
-    <div class="mew-child text-center py-4 bg-black text-light">
-      <h5>${escapeHtml(copyright)}</h5>
+    <div class="mew-child text-center py-4" style="background-color:${bg}; color:${textColor}; border-top:1px solid ${dividerColor};">
+      <h5 style="color:${textColor};">${escapeHtml(copyright)}</h5>
     </div>
   </div>`;
   }
