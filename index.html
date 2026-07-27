@@ -706,19 +706,6 @@
     "bi-grid","bi-layers","bi-file-earmark-text","bi-calendar","bi-clock","bi-tag"
   ];
 
-  const BG_SWATCHES = [
-    {label:"Primary", value:"#0d6efd", btn:"btn-primary"},
-    {label:"Secondary", value:"#6c757d", btn:"btn-secondary"},
-    {label:"Success", value:"#198754", btn:"btn-success"},
-    {label:"Danger", value:"#dc3545", btn:"btn-danger"},
-    {label:"Warning", value:"#ffc107", btn:"btn-warning"},
-    {label:"Info", value:"#0dcaf0", btn:"btn-info"},
-    {label:"Light", value:"#f8f9fa", btn:"btn-light"},
-    {label:"Dark", value:"#212529", btn:"btn-dark"},
-    {label:"White", value:"#ffffff", btn:"btn-light"},
-    {label:"Black", value:"#000000", btn:"btn-dark"},
-  ];
-
   // ---- 60-30-10 style auto contrast: pick readable text theme for any background ----
   function relativeLuminance(hex){
     let h = String(hex).replace("#", "");
@@ -734,10 +721,44 @@
     // Bright background -> dark text ("light" theme); dark background -> light text ("dark" theme)
     return relativeLuminance(hex) > 0.5 ? "light" : "dark";
   }
+  function contrastRatio(hexA, hexB){
+    const l1 = relativeLuminance(hexA), l2 = relativeLuminance(hexB);
+    const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  }
   // For a custom color with no Bootstrap name, fall back to a button that matches the theme's contrast
   function fallbackBtnForTheme(theme){
     return theme === "dark" ? "btn-light" : "btn-dark";
   }
+  // Hex reference for each Bootstrap button variant, used only to check it won't blend into the navbar
+  const BTN_VARIANT_HEX = {
+    "btn-primary":"#0d6efd", "btn-secondary":"#6c757d", "btn-success":"#198754",
+    "btn-danger":"#dc3545", "btn-warning":"#ffc107", "btn-info":"#0dcaf0",
+    "btn-light":"#f8f9fa", "btn-dark":"#212529"
+  };
+  // Same-name matching (Primary bg -> Primary button) looks great, but if the button color is
+  // too close to the navbar's own background it disappears — so only use it when it'll actually
+  // stand out; otherwise fall back to a plain light/dark button that always shows up.
+  function pickButtonStyle(candidateBtnClass, bgHex, theme){
+    const variantHex = BTN_VARIANT_HEX[candidateBtnClass];
+    if (!variantHex || contrastRatio(variantHex, bgHex) < 1.6){
+      return fallbackBtnForTheme(theme);
+    }
+    return candidateBtnClass;
+  }
+
+  const BG_SWATCHES = [
+    {label:"Primary", value:"#0d6efd", btn:"btn-primary"},
+    {label:"Secondary", value:"#6c757d", btn:"btn-secondary"},
+    {label:"Success", value:"#198754", btn:"btn-success"},
+    {label:"Danger", value:"#dc3545", btn:"btn-danger"},
+    {label:"Warning", value:"#ffc107", btn:"btn-warning"},
+    {label:"Info", value:"#0dcaf0", btn:"btn-info"},
+    {label:"Light", value:"#f8f9fa", btn:"btn-light"},
+    {label:"Dark", value:"#212529", btn:"btn-dark"},
+    {label:"White", value:"#ffffff", btn:"btn-light"},
+    {label:"Black", value:"#000000", btn:"btn-dark"},
+  ];
 
   let mode = "multipage"; // "multipage" | "onepage"
 
@@ -825,7 +846,7 @@
         selectedBg = sw.value;
         customBgEl.value = sw.value;
         navThemeEl.value = autoTextTheme(sw.value);
-        btnStyleEl.value = sw.btn || fallbackBtnForTheme(navThemeEl.value);
+        btnStyleEl.value = pickButtonStyle(sw.btn, sw.value, navThemeEl.value);
         renderSwatches();
         renderAll();
       });
@@ -1334,7 +1355,9 @@ ${socialHtml}
     const theme = navThemeEl.value; // "light" background -> dark text, "dark" background -> light text
     const textColor = theme === "dark" ? "#f1f3f5" : "#212529";
     const mutedTextColor = theme === "dark" ? "#c7cbd1" : "#495057";
-    const headingColor = brandAccentColorEl.value;
+    // Prefer the logo's accent color for headings, but if it's too close to the footer
+    // background to read clearly, fall back to the same guaranteed-readable text color instead
+    const headingColor = contrastRatio(brandAccentColorEl.value, bg) >= 2.5 ? brandAccentColorEl.value : textColor;
     const dividerColor = theme === "dark" ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.1)";
 
     const quickLinks = pages.slice(0, 6).map(p =>
@@ -1530,7 +1553,7 @@ ${footerHtml}
     customBgEl.value = newBg;
     navThemeEl.value = autoTextTheme(newBg);
     const matched = BG_SWATCHES.find(s => s.value.toLowerCase() === newBg);
-    btnStyleEl.value = matched ? matched.btn : fallbackBtnForTheme(navThemeEl.value);
+    btnStyleEl.value = pickButtonStyle(matched ? matched.btn : null, newBg, navThemeEl.value);
     renderSwatches();
     renderAll();
   });
