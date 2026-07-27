@@ -463,6 +463,23 @@
           <input type="text" class="form-control form-control-sm" id="brandLink" value="index.html" placeholder="#">
         </div>
 
+        <div class="row g-2 mb-3 align-items-end">
+          <div class="col-6">
+            <div class="form-label-sm">Logo Background</div>
+            <select class="form-select form-select-sm" id="logoBgStyle">
+              <option value="none" selected>None (transparent)</option>
+              <option value="white">White</option>
+              <option value="black">Black</option>
+              <option value="custom">Custom Color</option>
+            </select>
+          </div>
+          <div class="col-6" id="logoBgColorWrap" style="display:none;">
+            <div class="form-label-sm">Custom Color</div>
+            <input type="color" class="form-control form-control-color form-control-sm w-100" id="logoBgColor" value="#ffffff">
+          </div>
+        </div>
+        <div class="small-note mt-n2 mb-3">If the logo clashes with the navbar background, give it its own solid backdrop (white or black work well) instead of changing the whole navbar.</div>
+
         <div class="border rounded p-2 mb-2" style="border-color:var(--line)!important; background:#fbfcfe;">
           <div class="form-label-sm mb-2">Main Text (left side)</div>
           <div class="row g-2 align-items-center">
@@ -763,6 +780,9 @@
   const brandMainEl = document.getElementById("brandMain");
   const brandAccentEl = document.getElementById("brandAccent");
   const brandLinkEl = document.getElementById("brandLink");
+  const logoBgStyleEl = document.getElementById("logoBgStyle");
+  const logoBgColorEl = document.getElementById("logoBgColor");
+  const logoBgColorWrapEl = document.getElementById("logoBgColorWrap");
   const brandAccentColorEl = document.getElementById("brandAccentColor");
   const brandMainColorEl = document.getElementById("brandMainColor");
   const brandMainBoldEl = document.getElementById("brandMainBold");
@@ -1138,7 +1158,17 @@
       const accentClassAttr = accentClasses ? ` class="${accentClasses}"` : "";
       accentSpan = `<span${accentClassAttr} style="color: ${brandAccentColorEl.value};">${escapeHtml(accent)}</span>`;
     }
-    return `<a class="navbar-brand" href="${escapeHtml(link)}">${mainSpan}${accentSpan}</a>`;
+
+    // Optional solid backdrop behind the logo, independent of the navbar's own background
+    let bgColor = "";
+    if (logoBgStyleEl.value === "white") bgColor = "#ffffff";
+    else if (logoBgStyleEl.value === "black") bgColor = "#000000";
+    else if (logoBgStyleEl.value === "custom") bgColor = logoBgColorEl.value;
+    const brandStyle = bgColor
+      ? ` style="background-color:${bgColor}; padding:6px 14px; border-radius:8px; display:inline-flex; align-items:center;"`
+      : "";
+
+    return `<a class="navbar-brand" href="${escapeHtml(link)}"${brandStyle}>${mainSpan}${accentSpan}</a>`;
   }
 
   // Builds the <li> menu items. If activeOverrideId is provided, that item
@@ -1508,6 +1538,11 @@ ${footerHtml}
   brandMainEl.addEventListener("input", renderAll);
   brandAccentEl.addEventListener("input", renderAll);
   brandLinkEl.addEventListener("input", renderAll);
+  logoBgStyleEl.addEventListener("change", () => {
+    logoBgColorWrapEl.style.display = logoBgStyleEl.value === "custom" ? "block" : "none";
+    renderAll();
+  });
+  logoBgColorEl.addEventListener("input", renderAll);
   brandAccentColorEl.addEventListener("input", renderAll);
   brandMainColorEl.addEventListener("input", renderAll);
   brandMainBoldEl.addEventListener("change", renderAll);
