@@ -1,1 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navbar Generator — Bootstrap Navbar Builder</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+  :root{
+    --panel-bg:#ffffff;
+    --page-bg:#f3f5f9;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --accent:#4338ca;
+    --accent-dark:#362d99;
+    --accent-soft:#eef0fd;
+    --line:#e4e7ee;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.05);
+    --shadow-md:0 4px 14px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+    --shadow-lg:0 16px 40px rgba(16,24,40,.12);
+    --radius:16px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    background:
+      radial-gradient(1100px 420px at 15% -8%, rgba(67,56,202,.06), transparent 60%),
+      var(--page-bg);
+    color:var(--ink);
+    font-family:"Inter", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .builder-shell{
+    max-width:1400px;
+    margin:0 auto;
+    padding:32px 22px 70px;
+  }
+  .app-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:26px;
+  }
+  .app-icon-badge{
+    width:46px;
+    height:46px;
+    border-radius:13px;
+    background:linear-gradient(155deg, var(--accent), var(--accent-dark));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.3rem;
+    box-shadow:0 6px 16px rgba(67,56,202,.28);
+    flex-shrink:0;
+  }
+  .app-title{
+    font-weight:800;
+    font-size:1.5rem;
+    letter-spacing:-.01em;
+    line-height:1.2;
+  }
+  .app-sub{
+    color:var(--muted);
+    font-size:.92rem;
+    margin-top:1px;
+  }
+  .panel{
+    background:var(--panel-bg);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .15s ease;
+  }
+  .panel-title{
+    font-weight:700;
+    font-size:.98rem;
+    letter-spacing:-.005em;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--ink);
+  }
+  .panel-title .bi{
+    color:var(--accent);
+    background:var(--accent-soft);
+    width:28px;
+    height:28px;
+    border-radius:8px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:.95rem;
+  }
+
+  .menu-card{
+    border:1px solid var(--line);
+    border-radius:12px;
+    margin-bottom:10px;
+    background:#fff;
+    overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .15s ease, opacity .12s ease, border-color .15s ease;
+  }
+  .menu-card:hover{ box-shadow:var(--shadow-md); border-color:#d5d9e3; }
+  .menu-card.dragging{ opacity:.4; }
+  .menu-card.drop-target{ box-shadow:0 0 0 2px var(--accent) inset; }
+  .menu-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .menu-card-header:hover{ background:#f2f5fb; }
+  .menu-card-header .drag-handle{
+    cursor:grab;
+    color:var(--muted);
+    margin-right:2px;
+  }
+  .menu-card-header .drag-handle:active{ cursor:grabbing; }
+  .menu-index-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:22px;
+    height:22px;
+    padding:0 6px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-size:.75rem;
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .menu-card-header .chip{
+    font-size:.7rem;
+    font-weight:600;
+    padding:2px 9px;
+    border-radius:999px;
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+  .menu-card-body{
+    padding:0 16px 16px;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+  .menu-card-body.hidden{ display:none; }
+  .chevron{
+    transition:transform .15s ease;
+    color:var(--muted);
+  }
+  .chevron.open{ transform:rotate(180deg); }
+  .menu-card.has-dropdown .menu-card-header{
+    border-left:3px solid var(--accent);
+  }
+  .dropdown-editor{
+    margin-top:10px;
+    padding:14px 14px 8px;
+    border-radius:10px;
+    background:#f8f9fd;
+    border:1px solid var(--line);
+  }
+  .samelink-note{
+    font-size:.76rem;
+    color:var(--muted);
+    margin-top:4px;
+    margin-bottom:8px;
+  }
+  .drop-item-row{
+    position:relative;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:6px;
+    padding-left:16px;
+  }
+  .drop-item-row::before{
+    content:"";
+    position:absolute;
+    left:2px;
+    top:50%;
+    width:8px;
+    height:1px;
+    background:var(--muted);
+    opacity:.6;
+  }
+  .drop-item-row.locked .drop-link{
+    background:#eef1f6;
+    color:var(--muted);
+  }
+  .form-label-sm{
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:5px;
+    letter-spacing:.01em;
+  }
+  .form-control, .form-select{
+    border-color:var(--line);
+    font-size:.88rem;
+  }
+  .form-control:focus, .form-select:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .btn{ font-weight:600; font-size:.86rem; }
+  .btn-accent{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    box-shadow:0 2px 6px rgba(67,56,202,.22);
+  }
+  .btn-accent:hover{
+    background:var(--accent-dark);
+    border-color:var(--accent-dark);
+    color:#fff;
+  }
+  .btn-outline-secondary{ border-color:var(--line); color:var(--ink); }
+  .btn-outline-secondary:hover{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+
+  .reorder-btns{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .reorder-btns button{
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    border-radius:5px;
+    width:22px;
+    height:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    line-height:1;
+    font-size:.7rem;
+  }
+  .reorder-btns button:hover:not(:disabled){
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-color:var(--accent);
+  }
+  .reorder-btns button:disabled{
+    opacity:.3;
+    cursor:not-allowed;
+  }
+
+  .preview-panel{
+    margin-bottom:26px;
+    position:sticky;
+    top:16px;
+    z-index:50;
+  }
+  .preview-panel.is-stuck .preview-frame{
+    box-shadow:var(--shadow-lg);
+  }
+  .preview-panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .preview-frame{
+    border-radius:16px;
+    padding:22px;
+    min-height:auto;
+    background:
+      radial-gradient(600px 200px at 10% 0%, rgba(67,56,202,.05), transparent 65%),
+      #e9ecf3;
+    transition:box-shadow .15s ease;
+  }
+  .browser-frame{
+    border-radius:14px;
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-md);
+  }
+  .browser-chrome{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 16px;
+    background:#eef0f4;
+    border-bottom:1px solid var(--line);
+    border-radius:14px 14px 0 0;
+  }
+  .browser-dots{ display:flex; gap:6px; flex-shrink:0; }
+  .browser-dot{ width:10px; height:10px; border-radius:50%; }
+  .browser-dot.red{ background:#ec6a5e; }
+  .browser-dot.yellow{ background:#f4bf50; }
+  .browser-dot.green{ background:#61c454; }
+  .browser-address{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:5px 12px;
+    font-size:.78rem;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:7px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+  .browser-address .bi{ font-size:.72rem; color:#94a3b8; }
+  .preview-inner{
+    border-radius:0 0 14px 14px;
+    overflow:visible;
+    box-shadow:none;
+    min-height:150px;
+  }
+  /* Fullscreen preview mode */
+  #previewMount:fullscreen{
+    background:#fff;
+    display:flex;
+    align-items:flex-start;
+    justify-content:stretch;
+    padding:0;
+  }
+  #previewMount:fullscreen nav{
+    width:100%;
+  }
+  .code-box{
+    background:#0b0f19;
+    color:#d7e1ff;
+    border-radius:12px;
+    padding:16px;
+    font-family:"JetBrains Mono", "Fira Code", monospace;
+    font-size:.8rem;
+    line-height:1.55;
+    max-height:420px;
+    overflow:auto;
+    white-space:pre-wrap;
+    word-break:break-word;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .icon-picker-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(38px,1fr));
+    gap:6px;
+    max-height:180px;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px;
+    background:#fff;
+  }
+  .icon-picker-grid button{
+    border:1px solid transparent;
+    background:#f4f6fa;
+    border-radius:7px;
+    padding:6px 0;
+    font-size:1.05rem;
+    color:var(--ink);
+    transition:background .12s ease, color .12s ease;
+  }
+  .icon-picker-grid button:hover{ background:var(--accent-soft); }
+  .icon-picker-grid button.selected{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    color:var(--accent);
+  }
+  .swatch-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .swatch{
+    width:30px;height:30px;border-radius:9px;border:2px solid transparent;cursor:pointer;
+    box-shadow:inset 0 0 0 1px rgba(16,24,40,.06);
+    transition:transform .1s ease;
+  }
+  .swatch:hover{ transform:translateY(-1px); }
+  .swatch.selected{ border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-soft); }
+  .small-note{
+    font-size:.78rem;
+    color:var(--muted);
+    line-height:1.5;
+  }
+  .copy-toast{
+    position:fixed;
+    bottom:22px;
+    right:22px;
+    background:var(--ink);
+    color:#fff;
+    padding:11px 18px;
+    border-radius:10px;
+    font-size:.88rem;
+    font-weight:500;
+    box-shadow:var(--shadow-lg);
+    display:none;
+    z-index:2000;
+  }
+  .page-download-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 14px;
+    margin-bottom:8px;
+    background:#fbfcfe;
+    transition:box-shadow .12s ease;
+  }
+  .page-download-row:hover{ box-shadow:var(--shadow-sm); }
+</style>
+</head>
+<body>
+
+<div class="builder-shell">
+  <div class="app-header">
+    <div class="app-icon-badge"><i class="bi bi-layout-text-sidebar-reverse"></i></div>
+    <div>
+      <div class="app-title">Navbar Generator</div>
+      <div class="app-sub">Build a custom Bootstrap navbar — menus, dropdowns, icons, colors, all customizable.</div>
+    </div>
+  </div>
+
+  <!-- FULL-WIDTH LIVE PREVIEW -->
+  <div class="panel preview-panel" id="previewPanel">
+    <div class="preview-panel-header">
+      <div class="panel-title mb-0"><i class="bi bi-eye"></i> Live Preview</div>
+      <button class="btn btn-outline-secondary btn-sm" id="fullscreenBtn"><i class="bi bi-arrows-fullscreen"></i> Fullscreen</button>
+    </div>
+    <div class="preview-frame">
+      <div class="browser-frame">
+        <div class="browser-chrome">
+          <div class="browser-dots">
+            <span class="browser-dot red"></span>
+            <span class="browser-dot yellow"></span>
+            <span class="browser-dot green"></span>
+          </div>
+          <div class="browser-address"><i class="bi bi-lock-fill"></i><span id="browserAddressText">yoursite.com</span></div>
+        </div>
+        <div class="preview-inner" id="previewMount"></div>
+      </div>
+    </div>
+    <div class="small-note mt-2">This preview stays fixed on screen while you scroll through the settings below. Use Fullscreen to preview at real page width.</div>
+  </div>
+
+  <div class="row g-4">
+    <!-- LEFT: BUILDER CONTROLS -->
+    <div class="col-lg-6">
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-textarea-t"></i> Brand / Logo</div>
+
+        <div class="mb-2">
+          <div class="form-label-sm">Brand Link (where the logo goes)</div>
+          <input type="text" class="form-control form-control-sm" id="brandLink" value="index.html" placeholder="#">
+        </div>
+
+        <div class="row g-2 mb-3 align-items-end">
+          <div class="col-6">
+            <div class="form-label-sm">Logo Background</div>
+            <select class="form-select form-select-sm" id="logoBgStyle">
+              <option value="none" selected>None (transparent)</option>
+              <option value="white">White</option>
+              <option value="black">Black</option>
+              <option value="custom">Custom Color</option>
+            </select>
+          </div>
+          <div class="col-6" id="logoBgColorWrap" style="display:none;">
+            <div class="form-label-sm">Custom Color</div>
+            <input type="color" class="form-control form-control-color form-control-sm w-100" id="logoBgColor" value="#ffffff">
+          </div>
+        </div>
+        <div class="small-note mt-n2 mb-3">If the logo clashes with the navbar background, give it its own solid backdrop (white or black work well) instead of changing the whole navbar.</div>
+
+        <div class="border rounded p-2 mb-2" style="border-color:var(--line)!important; background:#fbfcfe;">
+          <div class="form-label-sm mb-2">Main Text (left side)</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-5">
+              <input type="text" class="form-control form-control-sm" id="brandMain" value="My">
+            </div>
+            <div class="col-3">
+              <input type="color" class="form-control form-control-color form-control-sm w-100" id="brandMainColor" value="#1c2430" title="Main text color">
+            </div>
+            <div class="col-4 d-flex gap-2 justify-content-end">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandMainBold" checked>
+                <label class="form-check-label small">Bold</label>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandMainItalic">
+                <label class="form-check-label small">Italic</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded p-2 mb-2" style="border-color:var(--line)!important; background:#fbfcfe;">
+          <div class="form-label-sm mb-2">Accent Text (right side, optional)</div>
+          <div class="row g-2 align-items-center">
+            <div class="col-5">
+              <input type="text" class="form-control form-control-sm" id="brandAccent" value="Website">
+            </div>
+            <div class="col-3">
+              <input type="color" class="form-control form-control-color form-control-sm w-100" id="brandAccentColor" value="#dc3545" title="Accent text color">
+            </div>
+            <div class="col-4 d-flex gap-2 justify-content-end">
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandAccentBold" checked>
+                <label class="form-check-label small">Bold</label>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="brandAccentItalic">
+                <label class="form-check-label small">Italic</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="small-note mt-1">Leave "Accent Text" blank for a single, uncolored logo. Each side has its own color and bold/italic style.</div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-diagram-3"></i> Navbar Type</div>
+        <select class="form-select mb-2" id="navMode">
+          <option value="multipage">Multi-page site (index.html, about.html...)</option>
+          <option value="onepage">Landing page / one-page (#home, #about... scroll links)</option>
+        </select>
+        <div class="small-note">Multi-page links each menu to its own page file. Landing page links scroll to a section on the same page.</div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-lightning-charge"></i> Quick Add Common Pages</div>
+        <div class="d-flex flex-wrap gap-2" id="quickAddWrap"></div>
+        <div class="small-note mt-2">Click to add — name and link fill in automatically, and you can still edit them afterward.</div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-list-ul"></i> Menu Items</div>
+        <div id="menuList"></div>
+        <button class="btn btn-accent btn-sm mt-2" id="addMenuBtn"><i class="bi bi-plus-lg"></i> Add Blank Menu</button>
+        <div class="small-note mt-2"><i class="bi bi-grip-vertical"></i> Drag a menu by its handle, or use the up/down arrows, to reorder — the number updates automatically to match its position.</div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-layout-sidebar-inset-reverse"></i> Right Side Widget</div>
+        <select class="form-select mb-3" id="rightWidgetType">
+          <option value="none">None</option>
+          <option value="search" selected>Search Form</option>
+          <option value="button">Button</option>
+        </select>
+
+        <div id="buttonFields" style="display:none;">
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <div class="form-label-sm">Button Text</div>
+              <input type="text" class="form-control form-control-sm" id="btnText" value="Get Started">
+            </div>
+            <div class="col-6">
+              <div class="form-label-sm">Button Link (which page it goes to)</div>
+              <input type="text" class="form-control form-control-sm" id="btnLink" value="get_started.html" placeholder="#">
+            </div>
+          </div>
+          <div class="form-label-sm">Button Style</div>
+          <div class="swatch-row mb-2" id="btnStyleSwatches"></div>
+          <select class="form-select form-select-sm d-none" id="btnStyle">
+            <option value="btn-primary">Primary</option>
+            <option value="btn-secondary">Secondary</option>
+            <option value="btn-success" selected>Success</option>
+            <option value="btn-danger">Danger</option>
+            <option value="btn-warning">Warning</option>
+            <option value="btn-info">Info</option>
+            <option value="btn-dark">Dark</option>
+            <option value="btn-light">Light</option>
+            <option value="btn-outline-primary">Outline Primary</option>
+            <option value="btn-outline-success">Outline Success</option>
+            <option value="btn-outline-danger">Outline Danger</option>
+            <option value="btn-outline-dark">Outline Dark</option>
+          </select>
+          <div class="small-note mt-2"><i class="bi bi-magic"></i> Auto-matches your Background Color theme above — pick a Bootstrap color there and this updates to match (you can still change it manually here).</div>
+          <div class="small-note mt-1">The button's link also gets its own downloadable page below.</div>
+        </div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-palette"></i> Colors & Theme</div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="form-label-sm mb-0">Background Color <span class="fw-normal text-muted" style="text-transform:none;">(Bootstrap colors)</span></div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="matchLogoBgBtn"><i class="bi bi-magic"></i> Match to Logo</button>
+        </div>
+        <div class="mb-3">
+          <div class="swatch-row mb-2" id="bgSwatches"></div>
+          <div class="form-label-sm mt-2">Custom Color</div>
+          <input type="color" class="form-control form-control-color" id="customBg" value="#f8f9fa" title="Pick your own color">
+          <div class="small-note mt-2">If the logo color is getting lost in the background, click <strong>Match to Logo</strong> — it'll pick a background that keeps your logo readable.</div>
+        </div>
+
+        <div class="mb-2">
+          <div class="form-label-sm">Text Style (auto-detected for contrast)</div>
+          <select class="form-select" id="navTheme">
+            <option value="light">Light background (dark text)</option>
+            <option value="dark">Dark background (light text)</option>
+          </select>
+          <div class="small-note mt-2"><i class="bi bi-magic"></i> Whichever background you pick, the readable text color is chosen automatically (contrast rule) — you can still override it manually here if needed.</div>
+        </div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-rulers"></i> Layout Options</div>
+        <div class="form-check form-switch mb-2">
+          <input class="form-check-input" type="checkbox" role="switch" id="stickyTop">
+          <label class="form-check-label" for="stickyTop">Keep navbar fixed at top on scroll (sticky-top)</label>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="containerFluid" checked>
+          <label class="form-check-label" for="containerFluid">Full-width layout (container-fluid)</label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><i class="bi bi-file-earmark-plus"></i> Full Page Settings (Topbar & Footer)</div>
+        <div class="mb-2">
+          <div class="form-label-sm">Topbar Custom Text (optional)</div>
+          <input type="text" class="form-control form-control-sm" id="topbarCustomText" placeholder="e.g. Free delivery on all orders this week!">
+          <div class="samelink-note">If filled, this text replaces the email/phone on the left side of the topbar.</div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <div class="form-label-sm">Contact Email</div>
+            <input type="text" class="form-control form-control-sm" id="siteEmail" value="info@example.com">
+          </div>
+          <div class="col-6">
+            <div class="form-label-sm">Contact Phone</div>
+            <input type="text" class="form-control form-control-sm" id="sitePhone" value="+880 1234 567890">
+          </div>
+        </div>
+        <div class="form-label-sm mb-1">Social Icons (Topbar & Footer)</div>
+        <div class="d-flex gap-3 flex-wrap mb-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="socialFacebook" checked>
+            <label class="form-check-label small">Facebook</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="socialTwitter" checked>
+            <label class="form-check-label small">Twitter / X</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="socialLinkedin" checked>
+            <label class="form-check-label small">LinkedIn</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="socialYoutube" checked>
+            <label class="form-check-label small">YouTube</label>
+          </div>
+        </div>
+        <div class="mb-2">
+          <div class="form-label-sm">Footer "About Us" Text</div>
+          <textarea class="form-control form-control-sm" id="footerAboutText" rows="2">Lorem ipsum dolor sit amet.</textarea>
+        </div>
+        <div>
+          <div class="form-label-sm">Copyright Text</div>
+          <input type="text" class="form-control form-control-sm" id="footerCopyright" value="© 2026 My Website. All rights reserved.">
+        </div>
+        <div class="small-note mt-2"><i class="bi bi-magic"></i> The footer's background and text color now follow the Background Color you pick above — headings pick up your logo's accent color.</div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: GENERATED CODE -->
+    <div class="col-lg-6">
+      <div class="panel">
+        <div class="panel-title"><i class="bi bi-code-slash"></i> Generated Code (Navbar Only)</div>
+        <pre class="code-box" id="codeOutput"></pre>
+        <button class="btn btn-accent btn-sm mt-3" id="copyCodeBtn"><i class="bi bi-clipboard"></i> Copy Code</button>
+        <div class="small-note mt-2">This is only the navbar snippet — make sure your page loads Bootstrap 5 CSS/JS before using it. For a complete, ready-to-use page (topbar, correct active menu, breadcrumb, footer) use "Download Full Pages" below instead.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel mt-4">
+    <div class="panel-title"><i class="bi bi-download"></i> Download Full Pages</div>
+    <div class="small-note mb-3">Each menu item below becomes its own complete, downloadable HTML page — with the topbar, correct page &lt;title&gt;, the matching menu item marked "active", a breadcrumb showing the current page, and the footer, all included automatically.</div>
+    <div id="downloadPagesWrap"></div>
+    <button class="btn btn-accent btn-sm mt-2" id="downloadAllZipBtn"><i class="bi bi-file-earmark-zip"></i> Download All Pages (.zip)</button>
+  </div>
+
+</div>
+
+<div class="copy-toast" id="copyToast"><i class="bi bi-check2-circle"></i> Code copied!</div>
+
+<div class="d-flex justify-content-center py-3 my-2">
+   <a class="btn btn-primary" href="https://zahidhasanriyad05-commits.github.io/layout/">Layout</a>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function(){
+  const ICONS = [
+    "bi-house","bi-info-circle","bi-envelope","bi-telephone","bi-person","bi-people",
+    "bi-cart","bi-bag","bi-gear","bi-star","bi-heart","bi-image","bi-camera",
+    "bi-book","bi-newspaper","bi-briefcase","bi-shop","bi-chat","bi-question-circle",
+    "bi-map","bi-compass","bi-globe","bi-shield-check","bi-award","bi-lightbulb",
+    "bi-grid","bi-layers","bi-file-earmark-text","bi-calendar","bi-clock","bi-tag"
+  ];
+
+  // ---- 60-30-10 style auto contrast: pick readable text theme for any background ----
+  function relativeLuminance(hex){
+    let h = String(hex).replace("#", "");
+    if (h.length === 3) h = h.split("").map(c => c + c).join("");
+    if (h.length !== 6) return 1; // fall back to "light" (dark text) if the value is invalid
+    const r = parseInt(h.substr(0,2),16) / 255;
+    const g = parseInt(h.substr(2,2),16) / 255;
+    const b = parseInt(h.substr(4,2),16) / 255;
+    const lin = c => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+    return 0.2126*lin(r) + 0.7152*lin(g) + 0.0722*lin(b);
+  }
+  function autoTextTheme(hex){
+    // Bright background -> dark text ("light" theme); dark background -> light text ("dark" theme)
+    return relativeLuminance(hex) > 0.5 ? "light" : "dark";
+  }
+  function contrastRatio(hexA, hexB){
+    const l1 = relativeLuminance(hexA), l2 = relativeLuminance(hexB);
+    const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+  // For a custom color with no Bootstrap name, fall back to a button that matches the theme's contrast
+  function fallbackBtnForTheme(theme){
+    return theme === "dark" ? "btn-light" : "btn-dark";
+  }
+  // Hex reference for each Bootstrap button variant, used only to check it won't blend into the navbar
+  const BTN_VARIANT_HEX = {
+    "btn-primary":"#0d6efd", "btn-secondary":"#6c757d", "btn-success":"#198754",
+    "btn-danger":"#dc3545", "btn-warning":"#ffc107", "btn-info":"#0dcaf0",
+    "btn-light":"#f8f9fa", "btn-dark":"#212529"
+  };
+  // Same-name matching (Primary bg -> Primary button) looks great, but if the button color is
+  // too close to the navbar's own background it disappears — so only use it when it'll actually
+  // stand out; otherwise fall back to a plain light/dark button that always shows up.
+  function pickButtonStyle(candidateBtnClass, bgHex, theme){
+    const variantHex = BTN_VARIANT_HEX[candidateBtnClass];
+    if (!variantHex || contrastRatio(variantHex, bgHex) < 1.6){
+      return fallbackBtnForTheme(theme);
+    }
+    return candidateBtnClass;
+  }
+
+  const BG_SWATCHES = [
+    {label:"Primary", value:"#0d6efd", btn:"btn-primary"},
+    {label:"Secondary", value:"#6c757d", btn:"btn-secondary"},
+    {label:"Success", value:"#198754", btn:"btn-success"},
+    {label:"Danger", value:"#dc3545", btn:"btn-danger"},
+    {label:"Warning", value:"#ffc107", btn:"btn-warning"},
+    {label:"Info", value:"#0dcaf0", btn:"btn-info"},
+    {label:"Light", value:"#f8f9fa", btn:"btn-light"},
+    {label:"Dark", value:"#212529", btn:"btn-dark"},
+    {label:"White", value:"#ffffff", btn:"btn-light"},
+    {label:"Black", value:"#000000", btn:"btn-dark"},
+  ];
+
+  const BTN_STYLE_SWATCHES = [
+    {label:"Primary", value:"btn-primary", hex:"#0d6efd"},
+    {label:"Secondary", value:"btn-secondary", hex:"#6c757d"},
+    {label:"Success", value:"btn-success", hex:"#198754"},
+    {label:"Danger", value:"btn-danger", hex:"#dc3545"},
+    {label:"Warning", value:"btn-warning", hex:"#ffc107"},
+    {label:"Info", value:"btn-info", hex:"#0dcaf0"},
+    {label:"Dark", value:"btn-dark", hex:"#212529"},
+    {label:"Light", value:"btn-light", hex:"#f8f9fa"},
+    {label:"Outline Primary", value:"btn-outline-primary", hex:"#0d6efd", outline:true},
+    {label:"Outline Success", value:"btn-outline-success", hex:"#198754", outline:true},
+    {label:"Outline Danger", value:"btn-outline-danger", hex:"#dc3545", outline:true},
+    {label:"Outline Dark", value:"btn-outline-dark", hex:"#212529", outline:true},
+  ];
+
+  let mode = "multipage"; // "multipage" | "onepage"
+  let btnLinkTouched = false; // becomes true once the user manually edits the Button Link field
+
+  const QUICK_PAGES = ["Home","About","Services","Portfolio","Blog","Team","Pricing","Gallery","Products","FAQ","Testimonials","Contact"];
+
+  function slugify(str){
+    return String(str).trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/(^_+|_+$)/g, "");
+  }
+
+  function autoLink(label){
+    const slug = slugify(label) || "page";
+    if (mode === "onepage"){
+      return "#" + (slug === "home" ? "home" : slug);
+    }
+    return slug === "home" ? "index.html" : slug + ".html";
+  }
+
+  function cryptoId(){ return "id" + Math.random().toString(36).slice(2,9); }
+
+  let menuItems = [
+    { id: cryptoId(), label: "Home", link: "index.html", active: true, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" },
+    { id: cryptoId(), label: "About", link: "about.html", active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" },
+    { id: cryptoId(), label: "Services", link: "services.html", active: false, disabled: false, icon: "", hasDropdown: true, dropdown: [
+        { id: cryptoId(), label: "Web Design", link:"web_design.html" },
+        { id: cryptoId(), label: "SEO", link:"seo.html" }
+      ], linkTouched: false, open: false, sameLinkForAll: true, sharedLink: "services.html" },
+    { id: cryptoId(), label: "Contact", link: "contact.html", active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" },
+  ];
+
+  let selectedBg = "#f8f9fa";
+  let dragFromIndex = null;
+
+  const navModeEl = document.getElementById("navMode");
+  const quickAddWrapEl = document.getElementById("quickAddWrap");
+  const menuListEl = document.getElementById("menuList");
+  const bgSwatchesEl = document.getElementById("bgSwatches");
+  const customBgEl = document.getElementById("customBg");
+  const navThemeEl = document.getElementById("navTheme");
+  const matchLogoBgBtnEl = document.getElementById("matchLogoBgBtn");
+  const brandMainEl = document.getElementById("brandMain");
+  const brandAccentEl = document.getElementById("brandAccent");
+  const brandLinkEl = document.getElementById("brandLink");
+  const logoBgStyleEl = document.getElementById("logoBgStyle");
+  const logoBgColorEl = document.getElementById("logoBgColor");
+  const logoBgColorWrapEl = document.getElementById("logoBgColorWrap");
+  const brandAccentColorEl = document.getElementById("brandAccentColor");
+  const brandMainColorEl = document.getElementById("brandMainColor");
+  const brandMainBoldEl = document.getElementById("brandMainBold");
+  const brandMainItalicEl = document.getElementById("brandMainItalic");
+  const brandAccentBoldEl = document.getElementById("brandAccentBold");
+  const brandAccentItalicEl = document.getElementById("brandAccentItalic");
+  const rightWidgetTypeEl = document.getElementById("rightWidgetType");
+  const buttonFieldsEl = document.getElementById("buttonFields");
+  const btnTextEl = document.getElementById("btnText");
+  const btnLinkEl = document.getElementById("btnLink");
+  const btnStyleEl = document.getElementById("btnStyle");
+  const stickyTopEl = document.getElementById("stickyTop");
+  const containerFluidEl = document.getElementById("containerFluid");
+  const previewMount = document.getElementById("previewMount");
+  const previewPanel = document.getElementById("previewPanel");
+  const codeOutput = document.getElementById("codeOutput");
+  const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+  // Full-page settings fields
+  const topbarCustomTextEl = document.getElementById("topbarCustomText");
+  const siteEmailEl = document.getElementById("siteEmail");
+  const sitePhoneEl = document.getElementById("sitePhone");
+  const socialFacebookEl = document.getElementById("socialFacebook");
+  const socialTwitterEl = document.getElementById("socialTwitter");
+  const socialLinkedinEl = document.getElementById("socialLinkedin");
+  const socialYoutubeEl = document.getElementById("socialYoutube");
+  const footerAboutTextEl = document.getElementById("footerAboutText");
+  const footerCopyrightEl = document.getElementById("footerCopyright");
+  const downloadPagesWrapEl = document.getElementById("downloadPagesWrap");
+  const downloadAllZipBtn = document.getElementById("downloadAllZipBtn");
+
+  function renderSwatches(){
+    bgSwatchesEl.innerHTML = "";
+    BG_SWATCHES.forEach(sw => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "swatch" + (sw.value === selectedBg ? " selected" : "");
+      btn.style.background = sw.value;
+      btn.title = sw.label;
+      btn.addEventListener("click", () => {
+        selectedBg = sw.value;
+        customBgEl.value = sw.value;
+        navThemeEl.value = autoTextTheme(sw.value);
+        btnStyleEl.value = pickButtonStyle(sw.btn, sw.value, navThemeEl.value);
+        renderSwatches();
+        renderBtnStyleSwatches();
+        renderAll();
+      });
+      bgSwatchesEl.appendChild(btn);
+    });
+  }
+
+  function renderBtnStyleSwatches(){
+    const wrap = document.getElementById("btnStyleSwatches");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    BTN_STYLE_SWATCHES.forEach(sw => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "swatch" + (sw.value === btnStyleEl.value ? " selected" : "");
+      btn.title = sw.label;
+      if (sw.outline){
+        btn.style.background = "#fff";
+        btn.style.boxShadow = `inset 0 0 0 2px ${sw.hex}`;
+      } else {
+        btn.style.background = sw.hex;
+      }
+      btn.addEventListener("click", () => {
+        btnStyleEl.value = sw.value;
+        renderBtnStyleSwatches();
+        renderAll();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  // Accordion helper: open exactly one card, close all others
+  function openOnly(id){
+    menuItems.forEach(it => it.open = (it.id === id));
+  }
+
+  function moveItem(index, direction){
+    const target = index + direction;
+    if (target < 0 || target >= menuItems.length) return;
+    const [moved] = menuItems.splice(index, 1);
+    menuItems.splice(target, 0, moved);
+    renderMenuList(); renderAll();
+  }
+
+  function renderMenuList(){
+    menuListEl.innerHTML = "";
+    menuItems.forEach((item, idx) => {
+      const card = document.createElement("div");
+      card.className = "menu-card" + (item.hasDropdown ? " has-dropdown" : "");
+      card.dataset.index = idx;
+      const title = item.label || "Untitled";
+      card.innerHTML = `
+        <div class="menu-card-header" data-toggle="${item.id}" draggable="true" data-drag-index="${idx}">
+          <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="bi bi-grip-vertical drag-handle"></i>
+            <span class="menu-index-badge">${idx+1}</span>
+            <span>${escapeHtml(title)}</span>
+            ${item.active ? '<span class="chip">Active</span>' : ''}
+            ${item.hasDropdown ? '<span class="chip">Dropdown</span>' : ''}
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="reorder-btns">
+              <button type="button" class="move-up-btn" data-index="${idx}" title="Move up" ${idx === 0 ? "disabled" : ""}><i class="bi bi-caret-up-fill"></i></button>
+              <button type="button" class="move-down-btn" data-index="${idx}" title="Move down" ${idx === menuItems.length - 1 ? "disabled" : ""}><i class="bi bi-caret-down-fill"></i></button>
+            </div>
+            <button class="btn btn-sm btn-outline-danger remove-btn" data-id="${item.id}" title="Remove" draggable="false"><i class="bi bi-trash"></i></button>
+            <i class="bi bi-chevron-down chevron ${item.open ? 'open' : ''}"></i>
+          </div>
+        </div>
+        <div class="menu-card-body ${item.open ? '' : 'hidden'}" data-body="${item.id}">
+          <div class="row g-2 mb-2">
+            <div class="col-7">
+              <div class="form-label-sm">Menu Name</div>
+              <input type="text" class="form-control form-control-sm menu-label" data-id="${item.id}" value="${escapeHtml(item.label)}">
+            </div>
+            <div class="col-5">
+              <div class="form-label-sm">Link (URL)</div>
+              <input type="text" class="form-control form-control-sm menu-link" data-id="${item.id}" value="${escapeHtml(item.link)}" placeholder="#">
+            </div>
+          </div>
+          <div class="d-flex flex-wrap gap-3 mb-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input menu-active" type="checkbox" role="switch" data-id="${item.id}" ${item.active ? "checked":""}>
+              <label class="form-check-label small">Active</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input menu-disabled" type="checkbox" role="switch" data-id="${item.id}" ${item.disabled ? "checked":""}>
+              <label class="form-check-label small">Disabled</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input menu-dropdown" type="checkbox" role="switch" data-id="${item.id}" ${item.hasDropdown ? "checked":""}>
+              <label class="form-check-label small">Dropdown</label>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="form-label-sm">Icon (optional)</div>
+            <div class="icon-picker-grid" data-id="${item.id}">
+              <button type="button" class="icon-opt ${item.icon==='' ? 'selected':''}" data-icon="" data-id="${item.id}" title="No icon">
+                <i class="bi bi-slash-circle"></i>
+              </button>
+              ${ICONS.map(ic => `<button type="button" class="icon-opt ${item.icon===ic ? 'selected':''}" data-icon="${ic}" data-id="${item.id}" title="${ic}"><i class="bi ${ic}"></i></button>`).join("")}
+            </div>
+          </div>
+          <div class="dropdown-editor" data-id="${item.id}" style="${item.hasDropdown ? '' : 'display:none;'}">
+            <div class="form-check form-switch mb-1">
+              <input class="form-check-input menu-samelink" type="checkbox" role="switch" data-id="${item.id}" ${item.sameLinkForAll ? "checked":""}>
+              <label class="form-check-label small">All submenu items open the same page</label>
+            </div>
+            <div class="mb-2 samelink-field" data-id="${item.id}" style="${item.sameLinkForAll ? '' : 'display:none;'}">
+              <div class="form-label-sm">Shared Page Link</div>
+              <input type="text" class="form-control form-control-sm menu-sharedlink" data-id="${item.id}" value="${escapeHtml(item.sharedLink || autoLink(item.label))}" placeholder="#">
+              <div class="samelink-note">Every submenu item below will link here, and only one page will be created for it.</div>
+            </div>
+            <div class="form-label-sm mb-1">Dropdown Items</div>
+            <div class="dropdown-items-wrap" data-id="${item.id}"></div>
+            <button class="btn btn-sm btn-outline-secondary add-dropdown-item mt-1" data-id="${item.id}"><i class="bi bi-plus"></i> Add Dropdown Item</button>
+          </div>
+          <button class="btn btn-sm btn-accent mt-3 done-btn" data-id="${item.id}"><i class="bi bi-check2"></i> Done — Close This Menu</button>
+        </div>
+      `;
+      menuListEl.appendChild(card);
+      renderDropdownItems(item);
+    });
+
+    // header click toggles accordion (open this one, close others)
+    document.querySelectorAll(".menu-card-header").forEach(header => {
+      header.addEventListener("click", e => {
+        if (e.target.closest(".remove-btn") || e.target.closest(".drag-handle") || e.target.closest(".reorder-btns")) return;
+        const id = header.dataset.toggle;
+        const item = menuItems.find(m => m.id === id);
+        if (item.open){
+          item.open = false; // collapse if clicking the already-open one
+        } else {
+          openOnly(id);
+        }
+        renderMenuList();
+      });
+    });
+
+    document.querySelectorAll(".move-up-btn").forEach(btn => btn.addEventListener("click", e => {
+      e.stopPropagation();
+      moveItem(parseInt(e.currentTarget.dataset.index, 10), -1);
+    }));
+    document.querySelectorAll(".move-down-btn").forEach(btn => btn.addEventListener("click", e => {
+      e.stopPropagation();
+      moveItem(parseInt(e.currentTarget.dataset.index, 10), 1);
+    }));
+
+    document.querySelectorAll(".done-btn").forEach(btn => btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const id = e.currentTarget.dataset.id;
+      const item = menuItems.find(m => m.id === id);
+      if (item) item.open = false;
+      renderMenuList();
+    }));
+
+    document.querySelectorAll(".remove-btn").forEach(b => b.addEventListener("click", e => {
+      e.stopPropagation();
+      const id = e.currentTarget.dataset.id;
+      menuItems = menuItems.filter(m => m.id !== id);
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".menu-label").forEach(inp => {
+      inp.addEventListener("click", e => e.stopPropagation());
+      inp.addEventListener("input", e => {
+        const id = e.target.dataset.id;
+        updateItem(id, it => {
+          it.label = e.target.value;
+          if (!it.linkTouched){
+            it.link = autoLink(it.label);
+          }
+        });
+        // refresh link field + header title text without full re-render (keeps input focus)
+        const linkInput = document.querySelector(`.menu-link[data-id="${id}"]`);
+        const it = menuItems.find(m => m.id === id);
+        if (linkInput && it) linkInput.value = it.link;
+        const headerTitle = document.querySelector(`.menu-card-header[data-toggle="${id}"] .fw-semibold span:nth-child(3)`);
+        if (headerTitle && it) headerTitle.textContent = it.label || "Untitled";
+      });
+    });
+    document.querySelectorAll(".menu-link").forEach(inp => {
+      inp.addEventListener("click", e => e.stopPropagation());
+      inp.addEventListener("input", e => {
+        updateItem(e.target.dataset.id, it => { it.link = e.target.value || "#"; it.linkTouched = true; });
+      });
+    });
+    document.querySelectorAll(".menu-active").forEach(inp => inp.addEventListener("change", e => {
+      e.stopPropagation();
+      const id = e.target.dataset.id;
+      // only one active at a time
+      menuItems.forEach(it => it.active = (it.id === id) ? e.target.checked : false);
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".menu-disabled").forEach(inp => inp.addEventListener("change", e => {
+      e.stopPropagation();
+      updateItem(e.target.dataset.id, it => it.disabled = e.target.checked);
+    }));
+    document.querySelectorAll(".menu-dropdown").forEach(inp => inp.addEventListener("change", e => {
+      e.stopPropagation();
+      updateItem(e.target.dataset.id, it => {
+        it.hasDropdown = e.target.checked;
+        if (it.hasDropdown && it.dropdown.length === 0){
+          it.dropdown.push({id: cryptoId(), label:"Action", link:"#"});
+        }
+        if (it.hasDropdown && it.sharedLink === ""){
+          // On by default — all submenu items open the same page; the user can switch it off
+          // if they want each submenu item to get its own separate downloadable page.
+          it.sameLinkForAll = true;
+          it.sharedLink = autoLink(it.label);
+        }
+      });
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".icon-opt").forEach(btn => btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const id = e.currentTarget.dataset.id;
+      const icon = e.currentTarget.dataset.icon;
+      updateItem(id, it => it.icon = icon);
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".add-dropdown-item").forEach(btn => btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const id = e.currentTarget.dataset.id;
+      updateItem(id, it => it.dropdown.push({id: cryptoId(), label:"New Item", link:"#"}));
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".menu-samelink").forEach(inp => inp.addEventListener("change", e => {
+      e.stopPropagation();
+      const id = e.target.dataset.id;
+      updateItem(id, it => {
+        it.sameLinkForAll = e.target.checked;
+        if (it.sameLinkForAll && !it.sharedLink){
+          it.sharedLink = autoLink(it.label);
+        }
+      });
+      renderMenuList(); renderAll();
+    }));
+    document.querySelectorAll(".menu-sharedlink").forEach(inp => {
+      inp.addEventListener("click", e => e.stopPropagation());
+      inp.addEventListener("input", e => {
+        updateItem(e.target.dataset.id, it => it.sharedLink = e.target.value || "#");
+        const wrap = document.querySelector(`.dropdown-items-wrap[data-id="${e.target.dataset.id}"]`);
+        if (wrap){
+          wrap.querySelectorAll(".drop-link").forEach(el => el.value = e.target.value || "#");
+        }
+      });
+    });
+
+    attachDragEvents();
+  }
+
+  // --- Drag & drop reordering ---
+  function attachDragEvents(){
+    const cards = Array.from(menuListEl.querySelectorAll(".menu-card"));
+
+    document.querySelectorAll(".menu-card-header").forEach(header => {
+      header.addEventListener("dragstart", e => {
+        const idx = parseInt(e.currentTarget.dataset.dragIndex, 10);
+        dragFromIndex = idx;
+        e.dataTransfer.effectAllowed = "move";
+        const card = e.currentTarget.closest(".menu-card");
+        if (card) card.classList.add("dragging");
+      });
+      header.addEventListener("dragend", e => {
+        const card = e.currentTarget.closest(".menu-card");
+        if (card) card.classList.remove("dragging");
+        cards.forEach(c => c.classList.remove("drop-target"));
+        dragFromIndex = null;
+      });
+    });
+
+    cards.forEach(card => {
+      card.addEventListener("dragover", e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        card.classList.add("drop-target");
+      });
+      card.addEventListener("dragleave", () => {
+        card.classList.remove("drop-target");
+      });
+      card.addEventListener("drop", e => {
+        e.preventDefault();
+        card.classList.remove("drop-target");
+        const toIndex = parseInt(card.dataset.index, 10);
+        if (dragFromIndex === null || dragFromIndex === toIndex) return;
+        const [moved] = menuItems.splice(dragFromIndex, 1);
+        menuItems.splice(toIndex, 0, moved);
+        dragFromIndex = null;
+        renderMenuList(); renderAll();
+      });
+    });
+  }
+
+  function renderDropdownItems(item){
+    const wrap = document.querySelector(`.dropdown-items-wrap[data-id="${item.id}"]`);
+    if (!wrap) return;
+    const locked = !!item.sameLinkForAll;
+    wrap.innerHTML = item.dropdown.map(d => `
+      <div class="drop-item-row${locked ? ' locked' : ''}">
+        <input type="text" class="form-control form-control-sm drop-label" data-parent="${item.id}" data-id="${d.id}" value="${escapeHtml(d.label)}" placeholder="Item name">
+        <input type="text" class="form-control form-control-sm drop-link" data-parent="${item.id}" data-id="${d.id}" value="${escapeHtml(locked ? (item.sharedLink || '#') : d.link)}" placeholder="#" ${locked ? "disabled title=\"Using the shared page link above\"" : ""}>
+        <button class="btn btn-sm btn-outline-danger drop-remove" data-parent="${item.id}" data-id="${d.id}"><i class="bi bi-x"></i></button>
+      </div>
+    `).join("");
+    wrap.querySelectorAll(".drop-label").forEach(inp => {
+      inp.addEventListener("click", e => e.stopPropagation());
+      inp.addEventListener("input", e => {
+        updateDropdownItem(e.target.dataset.parent, e.target.dataset.id, d => d.label = e.target.value);
+      });
+    });
+    wrap.querySelectorAll(".drop-link").forEach(inp => {
+      inp.addEventListener("click", e => e.stopPropagation());
+      inp.addEventListener("input", e => {
+        updateDropdownItem(e.target.dataset.parent, e.target.dataset.id, d => d.link = e.target.value || "#");
+      });
+    });
+    wrap.querySelectorAll(".drop-remove").forEach(btn => btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const parent = e.currentTarget.dataset.parent;
+      const id = e.currentTarget.dataset.id;
+      updateItem(parent, it => it.dropdown = it.dropdown.filter(d => d.id !== id));
+      renderMenuList(); renderAll();
+    }));
+  }
+
+  function updateItem(id, fn){
+    const it = menuItems.find(m => m.id === id);
+    if (it) fn(it);
+    renderAll();
+  }
+  function updateDropdownItem(parentId, id, fn){
+    const parent = menuItems.find(m => m.id === parentId);
+    if (!parent) return;
+    const d = parent.dropdown.find(x => x.id === id);
+    if (d) fn(d);
+    renderAll();
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function buildBrandHtml(){
+    const main = brandMainEl.value;
+    const accent = brandAccentEl.value.trim();
+    const link = brandLinkEl.value.trim() || "#";
+
+    const mainClasses = [brandMainBoldEl.checked ? "fw-bold" : "", brandMainItalicEl.checked ? "fst-italic" : ""].filter(Boolean).join(" ");
+    const mainClassAttr = mainClasses ? ` class="${mainClasses}"` : "";
+    const mainSpan = `<span${mainClassAttr} style="color: ${brandMainColorEl.value};">${escapeHtml(main) || "Brand"}</span>`;
+
+    let accentSpan = "";
+    if (accent){
+      const accentClasses = [brandAccentBoldEl.checked ? "fw-bold" : "", brandAccentItalicEl.checked ? "fst-italic" : ""].filter(Boolean).join(" ");
+      const accentClassAttr = accentClasses ? ` class="${accentClasses}"` : "";
+      accentSpan = `<span${accentClassAttr} style="color: ${brandAccentColorEl.value};">${escapeHtml(accent)}</span>`;
+    }
+
+    // Optional solid backdrop behind the logo, independent of the navbar's own background
+    let bgColor = "";
+    if (logoBgStyleEl.value === "white") bgColor = "#ffffff";
+    else if (logoBgStyleEl.value === "black") bgColor = "#000000";
+    else if (logoBgStyleEl.value === "custom") bgColor = logoBgColorEl.value;
+    const brandStyle = bgColor
+      ? ` style="background-color:${bgColor}; padding:6px 14px; border-radius:8px; display:inline-flex; align-items:center;"`
+      : "";
+
+    return `<a class="navbar-brand" href="${escapeHtml(link)}"${brandStyle}>${mainSpan}${accentSpan}</a>`;
+  }
+
+  // Builds the <li> menu items. If activeOverrideId is provided, that item
+  // (by id) is marked active instead of relying on each item's own `.active` flag.
+  function buildMenuHtml(activeOverrideId){
+    return menuItems.map(item => {
+      const isActive = (activeOverrideId != null) ? (item.id === activeOverrideId) : item.active;
+      const iconHtml = item.icon ? `<i class="bi ${item.icon} me-1"></i>` : "";
+      if (item.hasDropdown){
+        const dropItems = item.dropdown.map(d =>
+          `          <li><a class="dropdown-item" href="${escapeHtml(item.sameLinkForAll ? (item.sharedLink || '#') : d.link)}">${escapeHtml(d.label)}</a></li>`
+        ).join("\n");
+        return `        <li class="nav-item dropdown">
+          <a class="nav-link fw-bold dropdown-toggle${isActive ? " active" : ""}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"${isActive ? ' aria-current="page"' : ""}>
+            ${iconHtml}${escapeHtml(item.label)}
+          </a>
+          <ul class="dropdown-menu">
+${dropItems}
+          </ul>
+        </li>`;
+      }
+      if (item.disabled){
+        return `        <li class="nav-item">
+          <a class="nav-link fw-bold disabled" aria-disabled="true">${iconHtml}${escapeHtml(item.label)}</a>
+        </li>`;
+      }
+      return `        <li class="nav-item">
+          <a class="nav-link fw-bold${isActive ? " active" : ""}" ${isActive ? 'aria-current="page" ' : ""}href="${escapeHtml(item.link)}">${iconHtml}${escapeHtml(item.label)}</a>
+        </li>`;
+    }).join("\n");
+  }
+
+  function buildRightWidgetHtml(theme){
+    const widgetType = rightWidgetTypeEl.value;
+    if (widgetType === "search"){
+      return `
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-${theme === 'dark' ? 'light' : 'success'}" type="submit">Search</button>
+      </form>`;
+    } else if (widgetType === "button"){
+      const btnText = btnTextEl.value.trim() || "Button";
+      const btnLink = btnLinkEl.value.trim() || "#";
+      return `
+      <a class="btn ${btnStyleEl.value} ms-lg-2" href="${escapeHtml(btnLink)}" role="button">${escapeHtml(btnText)}</a>`;
+    }
+    return "";
+  }
+
+  // Builds the full <nav> block. Pass activeOverrideId to force a specific
+  // menu item active (used when generating an individual downloadable page).
+  function buildNavbarHtml(activeOverrideId){
+    const theme = navThemeEl.value;
+    const bg = customBgEl.value;
+    const containerClass = containerFluidEl.checked ? "container-fluid" : "container";
+    const stickyClass = stickyTopEl.checked ? " sticky-top" : "";
+    const navClasses = `navbar navbar-expand-lg${stickyClass}` + (theme === "dark" ? " navbar-dark" : " navbar-light");
+
+    const menuHtml = buildMenuHtml(activeOverrideId);
+    const rightHtml = buildRightWidgetHtml(theme);
+
+    return `<nav class="${navClasses}" style="background-color: ${bg};">
+  <div class="${containerClass}">
+    ${buildBrandHtml()}
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+${menuHtml}
+      </ul>${rightHtml}
+    </div>
+  </div>
+</nav>`;
+  }
+
+  /* ============ FULL PAGE (topbar + navbar + breadcrumb + footer) ============ */
+
+  function getAllPages(){
+    // Flattens menu items into a list of real, linkable pages.
+    // Dropdown parents (href="#") aren't pages themselves — their children are,
+    // unless "same link for all" is on, in which case the dropdown becomes one page.
+    let pages = [];
+    menuItems.forEach(item => {
+      if (item.disabled) return;
+      if (item.hasDropdown){
+        if (item.sameLinkForAll){
+          pages.push({ label: item.label, link: item.sharedLink || autoLink(item.label), activeMenuId: item.id });
+        } else {
+          item.dropdown.forEach(d => pages.push({ label: d.label, link: d.link, activeMenuId: item.id }));
+        }
+      } else {
+        pages.push({ label: item.label, link: item.link, activeMenuId: item.id });
+      }
+    });
+    // Right-side button widget: give its link a downloadable page too, if it points somewhere real
+    if (rightWidgetTypeEl.value === "button"){
+      const btnLink = btnLinkEl.value.trim();
+      if (btnLink && btnLink !== "#" && !pages.some(p => p.link === btnLink)){
+        pages.push({ label: btnTextEl.value.trim() || "Button Page", link: btnLink, activeMenuId: null });
+      }
+    }
+    return pages;
+  }
+
+  function isHomePage(page){
+    const s = slugify(page.label);
+    return s === "home" || page.link === "index.html" || page.link === "#home" || page.link === "#";
+  }
+
+  function pageFilename(page){
+    if (isHomePage(page)) return "index.html";
+    const link = String(page.link || "").trim();
+    // If a real link/name was given (not "#" or a same-page anchor), honor it as the filename
+    if (link && link !== "#" && !link.startsWith("#")){
+      let name = link.split("/").pop().split("?")[0].split("#")[0].trim();
+      if (name){
+        if (!/\.html?$/i.test(name)) name += ".html";
+        return name;
+      }
+    }
+    return (slugify(page.label) || "page") + ".html";
+  }
+
+  function buildTopbarHtml(){
+    const customText = topbarCustomTextEl.value.trim();
+    const email = siteEmailEl.value.trim();
+    const phone = sitePhoneEl.value.trim();
+    const socialIcons = [];
+    if (socialFacebookEl.checked) socialIcons.push("bi-facebook");
+    if (socialTwitterEl.checked) socialIcons.push("bi-twitter-x");
+    if (socialLinkedinEl.checked) socialIcons.push("bi-linkedin");
+    if (socialYoutubeEl.checked) socialIcons.push("bi-youtube");
+    const socialHtml = socialIcons.map(ic =>
+      `          <a class="text-black text-decoration-none fw-bold" href="#"><i class="bi ${ic}"></i></a>`
+    ).join("\n");
+    const contactHtml = customText
+      ? `          <span class="fw-bold">${escapeHtml(customText)}</span>`
+      : [
+          email ? `          <a class="text-black text-decoration-none fw-bold" href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>` : "",
+          phone ? `          <a class="text-black text-decoration-none fw-bold" href="tel:${escapeHtml(phone.replace(/\s+/g,''))}">${escapeHtml(phone)}</a>` : ""
+        ].filter(Boolean).join("\n");
+
+    return `  <div class="topbar bg-warning-subtle">
+    <div class="child">
+      <div class="d-flex justify-content-around py-2 flex-wrap gap-2">
+        <div class="d-flex gap-4">
+${contactHtml}
+        </div>
+        <div class="d-flex gap-4">
+${socialHtml}
+        </div>
+      </div>
+    </div>
+  </div>`;
+  }
+
+  function buildBreadcrumbHtml(page, homeLink){
+    return `  <div class="container py-4">
+    <h4>${escapeHtml(page.label)} Page</h4>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item fw-bold"><a href="${escapeHtml(homeLink)}">Home</a></li>
+        <li class="breadcrumb-item fw-bold" aria-current="page">${escapeHtml(page.label)}</li>
+      </ol>
+    </nav>
+  </div>`;
+  }
+
+  function buildFooterHtml(pages){
+    const about = footerAboutTextEl.value.trim() || "Lorem ipsum dolor sit amet.";
+    const copyright = footerCopyrightEl.value.trim() || "© 2026 My Website. All rights reserved.";
+
+    // Follow the same background/theme chosen for the navbar, so the footer matches instead of always being black
+    const bg = customBgEl.value;
+    const theme = navThemeEl.value; // "light" background -> dark text, "dark" background -> light text
+    const textColor = theme === "dark" ? "#f1f3f5" : "#212529";
+    const mutedTextColor = theme === "dark" ? "#c7cbd1" : "#495057";
+    // Prefer the logo's accent color for headings, but if it's too close to the footer
+    // background to read clearly, fall back to the same guaranteed-readable text color instead
+    const headingColor = contrastRatio(brandAccentColorEl.value, bg) >= 2.5 ? brandAccentColorEl.value : textColor;
+    const dividerColor = theme === "dark" ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.1)";
+
+    const quickLinks = pages.slice(0, 6).map(p =>
+      `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="${escapeHtml(p.link)}">${escapeHtml(p.label)}</a>`
+    ).join("\n");
+
+    const socialList = [];
+    if (socialFacebookEl.checked) socialList.push(["Facebook","bi-facebook"]);
+    if (socialTwitterEl.checked) socialList.push(["Twitter / X","bi-twitter-x"]);
+    if (socialLinkedinEl.checked) socialList.push(["LinkedIn","bi-linkedin"]);
+    if (socialYoutubeEl.checked) socialList.push(["YouTube","bi-youtube"]);
+    const socialLinksHtml = socialList.map(([name, ic]) =>
+      `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="#"><i class="bi ${ic} me-1"></i>${name}</a>`
+    ).join("\n");
+
+    return `  <div class="big-footer py-5" style="background-color:${bg};">
+    <div class="container d-flex justify-content-around flex-wrap gap-4">
+      <div>
+        <h4 style="color:${headingColor};">About Us</h4>
+        <p style="max-width:280px; color:${textColor};">${escapeHtml(about)}</p>
+      </div>
+      <div class="d-flex flex-column">
+        <h4 style="color:${headingColor};">Quick Links</h4>
+${quickLinks}
+      </div>
+      <div class="d-flex flex-column gap-1">
+        <h4 style="color:${headingColor};">Follow Us</h4>
+${socialLinksHtml}
+      </div>
+    </div>
+  </div>
+
+  <div class="mew-footer">
+    <div class="mew-child text-center py-4" style="background-color:${bg}; color:${textColor}; border-top:1px solid ${dividerColor};">
+      <h5 style="color:${textColor};">${escapeHtml(copyright)}</h5>
+      <div class="small"><span class="text-warning" id="dt"></span></div>
+    </div>
+  </div>`;
+  }
+
+  function buildFullPageHtml(page){
+    const brandName = [brandMainEl.value.trim(), brandAccentEl.value.trim()].filter(Boolean).join(" ") || "My Website";
+    const pageTitle = isHomePage(page) ? brandName : `${page.label} - ${brandName}`;
+    const navHtml = buildNavbarHtml(page.activeMenuId);
+    const topbarHtml = buildTopbarHtml();
+    const pages = getAllPages();
+    const homePage = pages.find(isHomePage) || pages[0] || { link: "index.html" };
+    const breadcrumbHtml = isHomePage(page) ? "" : ("\n" + buildBreadcrumbHtml(page, homePage.link) + "\n");
+    const footerHtml = buildFooterHtml(pages);
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(pageTitle)}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  .active{ border-bottom: 4px solid ${brandAccentColorEl.value}; }
+</style>
+</head>
+<body>
+
+${topbarHtml}
+
+${navHtml}
+${breadcrumbHtml}
+<br><br><br><br><br><br><br><br>
+
+${footerHtml}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>
+<script>
+  function updateFooterDateTime(){
+    const el = document.getElementById('dt');
+    if (el) el.textContent = new Date().toLocaleString();
+  }
+  updateFooterDateTime();
+  setInterval(updateFooterDateTime, 1000);
+<\/script>
+</body>
+</html>`;
+  }
+
+  function downloadTextFile(filename, content){
+    const blob = new Blob([content], {type: "text/html"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderDownloadPagesList(){
+    const pages = getAllPages();
+    if (!pages.length){
+      downloadPagesWrapEl.innerHTML = `<div class="small-note">Add some menu items above to generate downloadable pages.</div>`;
+      return;
+    }
+    downloadPagesWrapEl.innerHTML = pages.map((p, idx) => `
+      <div class="page-download-row">
+        <span><i class="bi bi-file-earmark-code me-2"></i><strong>${escapeHtml(p.label)}</strong> <span class="small-note">— ${escapeHtml(pageFilename(p))}</span></span>
+        <button class="btn btn-sm btn-outline-primary download-page-btn" data-index="${idx}"><i class="bi bi-download"></i> Download</button>
+      </div>
+    `).join("");
+
+    downloadPagesWrapEl.querySelectorAll(".download-page-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const page = pages[parseInt(btn.dataset.index, 10)];
+        downloadTextFile(pageFilename(page), buildFullPageHtml(page));
+      });
+    });
+  }
+
+  downloadAllZipBtn.addEventListener("click", async () => {
+    const pages = getAllPages();
+    if (!pages.length) return;
+    if (typeof JSZip === "undefined"){
+      alert("Could not load the zip library — check your internet connection and try again.");
+      return;
+    }
+    const zip = new JSZip();
+    // JSZip writes each entry's date using UTC getters, but the ZIP format (and your OS)
+    // reads it back as local time — so without compensation, extracted files show a
+    // Modified time shifted by your timezone offset. Correct for that here so the
+    // extracted files show the actual current date/time.
+    const now = new Date();
+    const zipDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    pages.forEach(page => zip.file(pageFilename(page), buildFullPageHtml(page), { date: zipDate }));
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "site-pages.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ============ PREVIEW / CODE OUTPUT (navbar only) ============ */
+
+  function renderAll(){
+    const html = buildNavbarHtml(); // no override -> uses each item's own `.active` flag
+    previewMount.innerHTML = html;
+    codeOutput.textContent = html;
+    renderDownloadPagesList();
+    renderBtnStyleSwatches();
+    const addrEl = document.getElementById("browserAddressText");
+    if (addrEl){
+      const link = brandLinkEl.value.trim();
+      addrEl.textContent = (!link || link === "#" || link === "index.html") ? "yoursite.com" : "yoursite.com/" + link.replace(/^#\/?/, "");
+    }
+  }
+
+  document.getElementById("addMenuBtn").addEventListener("click", () => {
+    const label = "New Page";
+    const id = cryptoId();
+    menuItems.push({ id, label, link: autoLink(label), active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" });
+    openOnly(id); // auto-open the newly added menu, collapse the rest
+    renderMenuList(); renderAll();
+  });
+
+  function renderQuickAdd(){
+    quickAddWrapEl.innerHTML = "";
+    QUICK_PAGES.forEach(name => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-sm btn-outline-secondary";
+      btn.textContent = name;
+      btn.addEventListener("click", () => {
+        const id = cryptoId();
+        menuItems.push({ id, label: name, link: autoLink(name), active: false, disabled: false, icon: "", hasDropdown: false, dropdown: [], linkTouched: false, open: false, sameLinkForAll: false, sharedLink: "" });
+        openOnly(id); // auto-open the newly added menu, collapse the rest
+        renderMenuList(); renderAll();
+      });
+      quickAddWrapEl.appendChild(btn);
+    });
+  }
+
+  navModeEl.addEventListener("change", () => {
+    mode = navModeEl.value;
+    // recompute links for items whose link the user hasn't manually customized
+    menuItems.forEach(it => {
+      if (!it.linkTouched) it.link = autoLink(it.label);
+    });
+    renderMenuList(); renderAll();
+  });
+
+  customBgEl.addEventListener("input", () => {
+    selectedBg = customBgEl.value;
+    navThemeEl.value = autoTextTheme(customBgEl.value);
+    btnStyleEl.value = fallbackBtnForTheme(navThemeEl.value);
+    renderSwatches();
+    renderAll();
+  });
+  matchLogoBgBtnEl.addEventListener("click", () => {
+    // Average the logo's main + accent text color brightness, then pick the
+    // background (white or dark) that keeps the logo readable against it.
+    const accentText = brandAccentEl.value.trim();
+    const mainLum = relativeLuminance(brandMainColorEl.value);
+    const logoLum = accentText ? (mainLum + relativeLuminance(brandAccentColorEl.value)) / 2 : mainLum;
+    const newBg = logoLum > 0.5 ? "#212529" : "#ffffff";
+    selectedBg = newBg;
+    customBgEl.value = newBg;
+    navThemeEl.value = autoTextTheme(newBg);
+    const matched = BG_SWATCHES.find(s => s.value.toLowerCase() === newBg);
+    btnStyleEl.value = pickButtonStyle(matched ? matched.btn : null, newBg, navThemeEl.value);
+    renderSwatches();
+    renderAll();
+  });
+  navThemeEl.addEventListener("change", renderAll);
+  brandMainEl.addEventListener("input", renderAll);
+  brandAccentEl.addEventListener("input", renderAll);
+  brandLinkEl.addEventListener("input", renderAll);
+  logoBgStyleEl.addEventListener("change", () => {
+    logoBgColorWrapEl.style.display = logoBgStyleEl.value === "custom" ? "block" : "none";
+    renderAll();
+  });
+  logoBgColorEl.addEventListener("input", renderAll);
+  brandAccentColorEl.addEventListener("input", renderAll);
+  brandMainColorEl.addEventListener("input", renderAll);
+  brandMainBoldEl.addEventListener("change", renderAll);
+  brandMainItalicEl.addEventListener("change", renderAll);
+  brandAccentBoldEl.addEventListener("change", renderAll);
+  brandAccentItalicEl.addEventListener("change", renderAll);
+  rightWidgetTypeEl.addEventListener("change", () => {
+    buttonFieldsEl.style.display = rightWidgetTypeEl.value === "button" ? "block" : "none";
+    renderAll();
+  });
+  btnTextEl.addEventListener("input", () => {
+    if (!btnLinkTouched){
+      btnLinkEl.value = autoLink(btnTextEl.value.trim() || "Button");
+    }
+    renderAll();
+  });
+  btnLinkEl.addEventListener("input", () => {
+    btnLinkTouched = true;
+    renderAll();
+  });
+  btnStyleEl.addEventListener("change", renderAll);
+  stickyTopEl.addEventListener("change", renderAll);
+  containerFluidEl.addEventListener("change", renderAll);
+
+  // Full page settings just need to refresh the downloadable pages list, not the live navbar preview
+  [topbarCustomTextEl, siteEmailEl, sitePhoneEl, socialFacebookEl, socialTwitterEl, socialLinkedinEl, socialYoutubeEl, footerAboutTextEl, footerCopyrightEl]
+    .forEach(el => el.addEventListener("input", renderDownloadPagesList));
+
+  document.getElementById("copyCodeBtn").addEventListener("click", () => {
+    navigator.clipboard.writeText(codeOutput.textContent).then(() => {
+      const toast = document.getElementById("copyToast");
+      toast.style.display = "block";
+      setTimeout(() => toast.style.display = "none", 1800);
+    });
+  });
+
+  fullscreenBtn.addEventListener("click", () => {
+    if (!document.fullscreenElement){
+      previewMount.requestFullscreen().catch(() => {
+        // Fullscreen API unavailable in this environment (e.g. sandboxed iframe) — no-op fallback
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  // Add a shadow to the preview panel once it's actually pinned to the top on scroll
+  if ("IntersectionObserver" in window){
+    const sentinel = document.createElement("div");
+    previewPanel.parentNode.insertBefore(sentinel, previewPanel);
+    const io = new IntersectionObserver(
+      ([entry]) => previewPanel.classList.toggle("is-stuck", !entry.isIntersecting),
+      { threshold: 1 }
+    );
+    io.observe(sentinel);
+  }
+
+  // init
+  renderSwatches();
+  renderQuickAdd();
+  renderMenuList();
+  renderAll();
+})();
+</script>
+</body>
+</html>
 
