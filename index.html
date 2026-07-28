@@ -969,7 +969,7 @@
         navThemeEl.value = autoTextTheme(sw.value);
         btnStyleEl.value = pickButtonStyle(sw.btn, sw.value, navThemeEl.value);
         renderSwatches();
-        renderBtnStyleSwatches();
+        syncBtnStyleSwatchSelection();
         renderAll();
       });
       bgSwatchesEl.appendChild(btn);
@@ -983,6 +983,7 @@
     BTN_STYLE_SWATCHES.forEach(sw => {
       const btn = document.createElement("button");
       btn.type = "button";
+      btn.dataset.value = sw.value;
       btn.className = "swatch" + (sw.value === btnStyleEl.value ? " selected" : "");
       btn.title = sw.label;
       if (sw.outline){
@@ -993,10 +994,21 @@
       }
       btn.addEventListener("click", () => {
         btnStyleEl.value = sw.value;
-        renderBtnStyleSwatches();
+        syncBtnStyleSwatchSelection();
         renderAll();
       });
       wrap.appendChild(btn);
+    });
+  }
+
+  // Just updates which swatch shows as "selected" without destroying/recreating the
+  // buttons — rebuilding the whole set on every keystroke was resetting the DOM out from
+  // under the cursor, which made the hover effect look like it stuck to the wrong swatch.
+  function syncBtnStyleSwatchSelection(){
+    const wrap = document.getElementById("btnStyleSwatches");
+    if (!wrap) return;
+    wrap.querySelectorAll(".swatch").forEach(btn => {
+      btn.classList.toggle("selected", btn.dataset.value === btnStyleEl.value);
     });
   }
 
@@ -1754,7 +1766,7 @@ ${footerHtml}
     const html = buildNavbarHtml(); // no override -> uses each item's own `.active` flag
     previewMount.innerHTML = html;
     renderDownloadPagesList();
-    renderBtnStyleSwatches();
+    syncBtnStyleSwatchSelection();
     const addrEl = document.getElementById("browserAddressText");
     if (addrEl){
       const link = brandLinkEl.value.trim();
@@ -1879,6 +1891,7 @@ ${footerHtml}
 
   // init
   renderSwatches();
+  renderBtnStyleSwatches();
   renderQuickAdd();
   renderMenuList();
   renderBtnIconPicker();
