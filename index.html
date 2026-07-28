@@ -1454,7 +1454,14 @@ ${dropItems}
       .hoverfx-skew .nav-link:hover{ transform:skewX(-8deg); }`
     };
     if (!fx || fx === "none" || !map[fx]) return "";
-    return `<style>${map[fx]}\n      </style>\n  `;
+    // Touch devices simulate ":hover" on tap but never fire the "un-hover" (mouseleave)
+    // event, so the effect looks stuck on whatever was last tapped. Restricting it to
+    // devices that support real hover (a mouse/trackpad) avoids that stuck state.
+    return `<style>
+      @media (hover: hover) and (pointer: fine){${map[fx]}
+      }
+      </style>
+  `;
   }
 
   // Builds the full <nav> block. Pass activeOverrideId to force a specific
@@ -1593,6 +1600,9 @@ ${socialHtml}
     // background to read clearly, fall back to the same guaranteed-readable text color instead
     const headingColor = contrastRatio(brandAccentColorEl.value, bg) >= 2.5 ? brandAccentColorEl.value : textColor;
     const dividerColor = theme === "dark" ? "rgba(255,255,255,.12)" : "rgba(0,0,0,.1)";
+    // Prefer the usual "warning" amber for the live clock, but if that color is too
+    // close to the footer background to read clearly, fall back to the guaranteed-readable text color
+    const dtColor = contrastRatio("#ffc107", bg) >= 2.5 ? "#ffc107" : textColor;
 
     const quickLinks = pages.slice(0, 6).map(p =>
       `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="${escapeHtml(p.link)}">${escapeHtml(p.label)}</a>`
@@ -1627,7 +1637,7 @@ ${socialLinksHtml}
   <div class="mew-footer">
     <div class="mew-child text-center py-4" style="background-color:${bg}; color:${textColor}; border-top:1px solid ${dividerColor};">
       <h5 style="color:${textColor};">${escapeHtml(copyright)}</h5>
-      <div class="small"><span class="text-warning" id="dt"></span></div>
+      <div class="small"><span id="dt" style="color:${dtColor};"></span></div>
     </div>
   </div>`;
   }
