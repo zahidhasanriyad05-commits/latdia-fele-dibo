@@ -13,26 +13,34 @@
 <style>
   :root{
     --panel-bg:#ffffff;
-    --page-bg:#f3f5f9;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --accent:#4338ca;
-    --accent-dark:#362d99;
-    --accent-soft:#eef0fd;
-    --line:#e4e7ee;
-    --shadow-sm:0 1px 2px rgba(16,24,40,.05);
-    --shadow-md:0 4px 14px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
-    --shadow-lg:0 16px 40px rgba(16,24,40,.12);
-    --radius:16px;
+    --page-bg:#f0f1f7;
+    --ink:#151827;
+    --muted:#6b7086;
+    --accent:#4f3cf0;
+    --accent-dark:#3a2ab8;
+    --accent-2:#c9a24b;
+    --accent-soft:#efedfe;
+    --line:#e7e6f0;
+    --shadow-sm:0 1px 2px rgba(21,17,60,.05);
+    --shadow-md:0 6px 18px rgba(21,17,60,.07), 0 1px 3px rgba(21,17,60,.07);
+    --shadow-lg:0 20px 48px rgba(21,17,60,.14);
+    --radius:18px;
   }
   *{ box-sizing:border-box; }
+  ::selection{ background:var(--accent-soft); color:var(--accent-dark); }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:#d3d3e4; border-radius:99px; border:2px solid var(--page-bg); }
+  ::-webkit-scrollbar-thumb:hover{ background:#b8b8d6; }
   body{
     background:
-      radial-gradient(1100px 420px at 15% -8%, rgba(67,56,202,.06), transparent 60%),
+      radial-gradient(1200px 480px at 12% -10%, rgba(79,60,240,.10), transparent 60%),
+      radial-gradient(900px 380px at 100% 0%, rgba(201,162,75,.07), transparent 55%),
       var(--page-bg);
     color:var(--ink);
     font-family:"Inter", "Segoe UI", system-ui, sans-serif;
     -webkit-font-smoothing:antialiased;
+    letter-spacing:-.005em;
   }
   .builder-shell{
     max-width:1400px;
@@ -42,40 +50,63 @@
   .app-header{
     display:flex;
     align-items:center;
-    gap:14px;
-    margin-bottom:26px;
+    gap:16px;
+    margin-bottom:30px;
+    padding:18px 24px;
+    background:linear-gradient(120deg, #ffffff, #fbfaff);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:var(--shadow-md);
+    position:relative;
+    overflow:hidden;
+  }
+  .app-header::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+    height:3px;
+    top:0;
   }
   .app-icon-badge{
-    width:46px;
-    height:46px;
-    border-radius:13px;
-    background:linear-gradient(155deg, var(--accent), var(--accent-dark));
+    width:50px;
+    height:50px;
+    border-radius:14px;
+    background:linear-gradient(155deg, var(--accent), var(--accent-dark) 70%, var(--accent-2));
     color:#fff;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:1.3rem;
-    box-shadow:0 6px 16px rgba(67,56,202,.28);
+    font-size:1.4rem;
+    box-shadow:0 8px 20px rgba(79,60,240,.32), inset 0 1px 0 rgba(255,255,255,.25);
     flex-shrink:0;
   }
   .app-title{
     font-weight:800;
-    font-size:1.5rem;
-    letter-spacing:-.01em;
+    font-size:1.55rem;
+    letter-spacing:-.02em;
     line-height:1.2;
+    background:linear-gradient(100deg, var(--ink), #423a75 120%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
   }
   .app-sub{
     color:var(--muted);
     font-size:.92rem;
-    margin-top:1px;
+    margin-top:2px;
   }
   .panel{
     background:var(--panel-bg);
     border:1px solid var(--line);
     border-radius:var(--radius);
-    padding:22px;
+    padding:24px;
     box-shadow:var(--shadow-sm);
-    transition:box-shadow .15s ease;
+    transition:box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .panel:hover{
+    box-shadow:var(--shadow-md);
+    border-color:#dcdaf0;
   }
   .panel-title{
     font-weight:700;
@@ -84,19 +115,20 @@
     margin-bottom:16px;
     display:flex;
     align-items:center;
-    gap:9px;
+    gap:10px;
     color:var(--ink);
   }
   .panel-title .bi{
     color:var(--accent);
-    background:var(--accent-soft);
-    width:28px;
-    height:28px;
-    border-radius:8px;
+    background:linear-gradient(155deg, var(--accent-soft), #e3e0fb);
+    width:30px;
+    height:30px;
+    border-radius:9px;
     display:inline-flex;
     align-items:center;
     justify-content:center;
     font-size:.95rem;
+    box-shadow:inset 0 0 0 1px rgba(79,60,240,.08);
   }
 
   .menu-card{
@@ -212,20 +244,22 @@
     border-color:var(--accent);
     box-shadow:0 0 0 3px var(--accent-soft);
   }
-  .btn{ font-weight:600; font-size:.86rem; }
+  .btn{ font-weight:600; font-size:.86rem; border-radius:10px; transition:all .15s ease; }
   .btn-accent{
-    background:var(--accent);
-    border-color:var(--accent);
-    color:#fff;
-    box-shadow:0 2px 6px rgba(67,56,202,.22);
-  }
-  .btn-accent:hover{
-    background:var(--accent-dark);
+    background:linear-gradient(135deg, var(--accent), var(--accent-dark));
     border-color:var(--accent-dark);
     color:#fff;
+    box-shadow:0 4px 12px rgba(79,60,240,.28);
+  }
+  .btn-accent:hover{
+    background:linear-gradient(135deg, var(--accent-dark), var(--accent));
+    border-color:var(--accent-dark);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(79,60,240,.36);
+    transform:translateY(-1px);
   }
   .btn-outline-secondary{ border-color:var(--line); color:var(--ink); }
-  .btn-outline-secondary:hover{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+  .btn-outline-secondary:hover{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
 
   .reorder-btns{
     display:flex;
@@ -272,19 +306,20 @@
     margin-bottom:14px;
   }
   .preview-frame{
-    border-radius:16px;
+    border-radius:18px;
     padding:22px;
     min-height:auto;
     background:
-      radial-gradient(600px 200px at 10% 0%, rgba(67,56,202,.05), transparent 65%),
-      #e9ecf3;
+      radial-gradient(700px 240px at 10% 0%, rgba(79,60,240,.08), transparent 65%),
+      radial-gradient(500px 200px at 100% 100%, rgba(201,162,75,.06), transparent 60%),
+      #e9ebf5;
     transition:box-shadow .15s ease;
   }
   .browser-frame{
-    border-radius:14px;
+    border-radius:16px;
     background:#fff;
     border:1px solid var(--line);
-    box-shadow:var(--shadow-md);
+    box-shadow:var(--shadow-lg);
   }
   .browser-chrome{
     display:flex;
@@ -334,9 +369,9 @@
     width:100%;
   }
   .code-box{
-    background:#0b0f19;
+    background:linear-gradient(160deg, #0d1120, #090c16);
     color:#d7e1ff;
-    border-radius:12px;
+    border-radius:14px;
     padding:16px;
     font-family:"JetBrains Mono", "Fira Code", monospace;
     font-size:.8rem;
@@ -345,8 +380,9 @@
     overflow:auto;
     white-space:pre-wrap;
     word-break:break-word;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(10,10,30,.35);
   }
+  .code-box::-webkit-scrollbar-thumb{ background:#2a2f4a; }
   .icon-picker-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(38px,1fr));
@@ -404,6 +440,33 @@
     display:none;
     z-index:2000;
   }
+  .social-link-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#fbfcfe;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:7px 10px;
+  }
+  .social-link-toggle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:0 0 128px;
+    margin:0;
+    padding-left:2.4em;
+  }
+  .social-link-toggle .form-check-label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+  }
+  .social-link-row .form-control{
+    flex:1;
+    border-color:var(--line);
+  }
   .page-download-row{
     display:flex;
     justify-content:space-between;
@@ -452,7 +515,7 @@
   </div>
 
   <div class="row g-4">
-    <!-- LEFT: BUILDER CONTROLS -->
+    <!-- LEFT: BRAND, NAVBAR STRUCTURE & MENU -->
     <div class="col-lg-6">
 
       <div class="panel mb-4">
@@ -537,6 +600,28 @@
       </div>
 
       <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-cursor"></i> Menu Hover Effect</div>
+        <select class="form-select" id="navHoverFx">
+          <option value="none">None (Default)</option>
+          <option value="underline-slide" selected>Underline — Slide In (Left to Right)</option>
+          <option value="underline-center">Underline — Grow from Center</option>
+          <option value="underline-fade">Underline — Fade In</option>
+          <option value="underline-double">Underline — Double Line</option>
+          <option value="bg-fill">Background — Solid Fill</option>
+          <option value="bg-fade">Background — Soft Fade</option>
+          <option value="text-accent">Text Color — Shift to Accent</option>
+          <option value="scale-up">Scale Up</option>
+          <option value="lift-up">Lift Up (Float)</option>
+          <option value="letter-spacing">Letter Spacing Expand</option>
+          <option value="glow">Text Glow</option>
+          <option value="border-box">Border Box Outline</option>
+          <option value="dot-indicator">Bottom Dot Indicator</option>
+          <option value="skew">Slight Skew</option>
+        </select>
+        <div class="small-note mt-2"><i class="bi bi-magic"></i> Hover over a menu item in the Live Preview above to see it. Uses your Accent Text color as the effect color.</div>
+      </div>
+
+      <div class="panel mb-4">
         <div class="panel-title"><i class="bi bi-lightning-charge"></i> Quick Add Common Pages</div>
         <div class="d-flex flex-wrap gap-2" id="quickAddWrap"></div>
         <div class="small-note mt-2">Click to add — name and link fill in automatically, and you can still edit them afterward.</div>
@@ -548,6 +633,11 @@
         <button class="btn btn-accent btn-sm mt-2" id="addMenuBtn"><i class="bi bi-plus-lg"></i> Add Blank Menu</button>
         <div class="small-note mt-2"><i class="bi bi-grip-vertical"></i> Drag a menu by its handle, or use the up/down arrows, to reorder — the number updates automatically to match its position.</div>
       </div>
+
+    </div>
+
+    <!-- RIGHT: WIDGET, COLORS, LAYOUT & FULL PAGE SETTINGS -->
+    <div class="col-lg-6">
 
       <div class="panel mb-4">
         <div class="panel-title"><i class="bi bi-layout-sidebar-inset-reverse"></i> Right Side Widget</div>
@@ -643,23 +733,34 @@
           </div>
         </div>
         <div class="form-label-sm mb-1">Social Icons (Topbar & Footer)</div>
-        <div class="d-flex gap-3 flex-wrap mb-3">
-          <div class="form-check form-switch">
+        <div class="small-note mb-2">Turn each icon on/off and set the link it should open — paste your real profile URL, or leave it blank for a "#" placeholder.</div>
+        <div class="social-link-row mb-2">
+          <div class="form-check form-switch social-link-toggle">
             <input class="form-check-input" type="checkbox" role="switch" id="socialFacebook" checked>
-            <label class="form-check-label small">Facebook</label>
+            <label class="form-check-label small"><i class="bi bi-facebook"></i> Facebook</label>
           </div>
-          <div class="form-check form-switch">
+          <input type="text" class="form-control form-control-sm" id="socialFacebookUrl" placeholder="https://facebook.com/yourpage">
+        </div>
+        <div class="social-link-row mb-2">
+          <div class="form-check form-switch social-link-toggle">
             <input class="form-check-input" type="checkbox" role="switch" id="socialTwitter" checked>
-            <label class="form-check-label small">Twitter / X</label>
+            <label class="form-check-label small"><i class="bi bi-twitter-x"></i> Twitter / X</label>
           </div>
-          <div class="form-check form-switch">
+          <input type="text" class="form-control form-control-sm" id="socialTwitterUrl" placeholder="https://x.com/yourhandle">
+        </div>
+        <div class="social-link-row mb-2">
+          <div class="form-check form-switch social-link-toggle">
             <input class="form-check-input" type="checkbox" role="switch" id="socialLinkedin" checked>
-            <label class="form-check-label small">LinkedIn</label>
+            <label class="form-check-label small"><i class="bi bi-linkedin"></i> LinkedIn</label>
           </div>
-          <div class="form-check form-switch">
+          <input type="text" class="form-control form-control-sm" id="socialLinkedinUrl" placeholder="https://linkedin.com/company/yourpage">
+        </div>
+        <div class="social-link-row mb-3">
+          <div class="form-check form-switch social-link-toggle">
             <input class="form-check-input" type="checkbox" role="switch" id="socialYoutube" checked>
-            <label class="form-check-label small">YouTube</label>
+            <label class="form-check-label small"><i class="bi bi-youtube"></i> YouTube</label>
           </div>
+          <input type="text" class="form-control form-control-sm" id="socialYoutubeUrl" placeholder="https://youtube.com/@yourchannel">
         </div>
         <div class="mb-2">
           <div class="form-label-sm">Footer "About Us" Text</div>
@@ -673,16 +774,6 @@
       </div>
 
     </div>
-
-    <!-- RIGHT: GENERATED CODE -->
-    <div class="col-lg-6">
-      <div class="panel">
-        <div class="panel-title"><i class="bi bi-code-slash"></i> Generated Code (Navbar Only)</div>
-        <pre class="code-box" id="codeOutput"></pre>
-        <button class="btn btn-accent btn-sm mt-3" id="copyCodeBtn"><i class="bi bi-clipboard"></i> Copy Code</button>
-        <div class="small-note mt-2">This is only the navbar snippet — make sure your page loads Bootstrap 5 CSS/JS before using it. For a complete, ready-to-use page (topbar, correct active menu, breadcrumb, footer) use "Download Full Pages" below instead.</div>
-      </div>
-    </div>
   </div>
 
   <div class="panel mt-4">
@@ -694,7 +785,7 @@
 
 </div>
 
-<div class="copy-toast" id="copyToast"><i class="bi bi-check2-circle"></i> Code copied!</div>
+
 
 <div class="d-flex justify-content-center py-3 my-2">
    <a class="btn btn-primary" href="https://zahidhasanriyad05-commits.github.io/layout/">Layout</a>
@@ -841,8 +932,8 @@
   const containerFluidEl = document.getElementById("containerFluid");
   const previewMount = document.getElementById("previewMount");
   const previewPanel = document.getElementById("previewPanel");
-  const codeOutput = document.getElementById("codeOutput");
   const fullscreenBtn = document.getElementById("fullscreenBtn");
+  const navHoverFxEl = document.getElementById("navHoverFx");
 
   // Full-page settings fields
   const topbarCustomTextEl = document.getElementById("topbarCustomText");
@@ -852,6 +943,10 @@
   const socialTwitterEl = document.getElementById("socialTwitter");
   const socialLinkedinEl = document.getElementById("socialLinkedin");
   const socialYoutubeEl = document.getElementById("socialYoutube");
+  const socialFacebookUrlEl = document.getElementById("socialFacebookUrl");
+  const socialTwitterUrlEl = document.getElementById("socialTwitterUrl");
+  const socialLinkedinUrlEl = document.getElementById("socialLinkedinUrl");
+  const socialYoutubeUrlEl = document.getElementById("socialYoutubeUrl");
   const footerAboutTextEl = document.getElementById("footerAboutText");
   const footerCopyrightEl = document.getElementById("footerCopyright");
   const downloadPagesWrapEl = document.getElementById("downloadPagesWrap");
@@ -1288,6 +1383,64 @@ ${dropItems}
     return "";
   }
 
+  // Returns a <style> block (or "" for "none") implementing the chosen hover effect,
+  // scoped to this navbar only via the .hoverfx-<key> class placed on the <nav> tag.
+  function buildHoverFxCss(fx, accent){
+    const c = accent || "#4f3cf0";
+    const map = {
+      "underline-slide": `
+      .hoverfx-underline-slide .nav-link{ position:relative; display:inline-block; }
+      .hoverfx-underline-slide .nav-link::before{ content:""; position:absolute; left:0; bottom:2px; width:0; height:2px; background:${c}; transition:width .25s ease; }
+      .hoverfx-underline-slide .nav-link:hover::before{ width:100%; }`,
+      "underline-center": `
+      .hoverfx-underline-center .nav-link{ position:relative; display:inline-block; }
+      .hoverfx-underline-center .nav-link::before{ content:""; position:absolute; left:50%; bottom:2px; width:0; height:2px; background:${c}; transform:translateX(-50%); transition:width .25s ease; }
+      .hoverfx-underline-center .nav-link:hover::before{ width:100%; }`,
+      "underline-fade": `
+      .hoverfx-underline-fade .nav-link{ position:relative; display:inline-block; }
+      .hoverfx-underline-fade .nav-link::before{ content:""; position:absolute; left:0; right:0; bottom:2px; height:2px; background:${c}; opacity:0; transition:opacity .25s ease; }
+      .hoverfx-underline-fade .nav-link:hover::before{ opacity:1; }`,
+      "underline-double": `
+      .hoverfx-underline-double .nav-link{ position:relative; display:inline-block; padding-bottom:8px; }
+      .hoverfx-underline-double .nav-link::before{ content:""; position:absolute; left:0; bottom:2px; width:0; height:2px; background:${c}; box-shadow:0 4px 0 ${c}; transition:width .25s ease; }
+      .hoverfx-underline-double .nav-link:hover::before{ width:100%; }`,
+      "bg-fill": `
+      .hoverfx-bg-fill .nav-link{ border-radius:8px; transition:background-color .2s ease, color .2s ease; }
+      .hoverfx-bg-fill .nav-link:hover{ background-color:${c}; color:#fff !important; }`,
+      "bg-fade": `
+      .hoverfx-bg-fade .nav-link{ position:relative; z-index:0; border-radius:8px; }
+      .hoverfx-bg-fade .nav-link::before{ content:""; position:absolute; inset:0; background:${c}; opacity:0; border-radius:8px; transition:opacity .25s ease; z-index:-1; }
+      .hoverfx-bg-fade .nav-link:hover::before{ opacity:.14; }`,
+      "text-accent": `
+      .hoverfx-text-accent .nav-link{ transition:color .2s ease; }
+      .hoverfx-text-accent .nav-link:hover{ color:${c} !important; }`,
+      "scale-up": `
+      .hoverfx-scale-up .nav-link{ display:inline-block; transition:transform .2s ease; }
+      .hoverfx-scale-up .nav-link:hover{ transform:scale(1.1); }`,
+      "lift-up": `
+      .hoverfx-lift-up .nav-link{ display:inline-block; transition:transform .2s ease; }
+      .hoverfx-lift-up .nav-link:hover{ transform:translateY(-3px); }`,
+      "letter-spacing": `
+      .hoverfx-letter-spacing .nav-link{ transition:letter-spacing .2s ease; }
+      .hoverfx-letter-spacing .nav-link:hover{ letter-spacing:1.5px; }`,
+      "glow": `
+      .hoverfx-glow .nav-link{ transition:text-shadow .2s ease, color .2s ease; }
+      .hoverfx-glow .nav-link:hover{ text-shadow:0 0 10px ${c}; color:${c} !important; }`,
+      "border-box": `
+      .hoverfx-border-box .nav-link{ border:1px solid transparent; border-radius:8px; transition:border-color .2s ease; }
+      .hoverfx-border-box .nav-link:hover{ border-color:${c}; }`,
+      "dot-indicator": `
+      .hoverfx-dot-indicator .nav-link{ position:relative; display:inline-block; }
+      .hoverfx-dot-indicator .nav-link::before{ content:""; position:absolute; left:50%; bottom:-2px; width:5px; height:5px; border-radius:50%; background:${c}; opacity:0; transform:translateX(-50%) scale(.4); transition:all .2s ease; }
+      .hoverfx-dot-indicator .nav-link:hover::before{ opacity:1; transform:translateX(-50%) scale(1); }`,
+      "skew": `
+      .hoverfx-skew .nav-link{ display:inline-block; transition:transform .2s ease; }
+      .hoverfx-skew .nav-link:hover{ transform:skewX(-8deg); }`
+    };
+    if (!fx || fx === "none" || !map[fx]) return "";
+    return `<style>${map[fx]}\n      </style>\n  `;
+  }
+
   // Builds the full <nav> block. Pass activeOverrideId to force a specific
   // menu item active (used when generating an individual downloadable page).
   function buildNavbarHtml(activeOverrideId){
@@ -1295,12 +1448,15 @@ ${dropItems}
     const bg = customBgEl.value;
     const containerClass = containerFluidEl.checked ? "container-fluid" : "container";
     const stickyClass = stickyTopEl.checked ? " sticky-top" : "";
-    const navClasses = `navbar navbar-expand-lg${stickyClass}` + (theme === "dark" ? " navbar-dark" : " navbar-light");
+    const hoverFx = navHoverFxEl.value;
+    const hoverFxClass = (hoverFx && hoverFx !== "none") ? ` hoverfx-${hoverFx}` : "";
+    const navClasses = `navbar navbar-expand-lg${stickyClass}${hoverFxClass}` + (theme === "dark" ? " navbar-dark" : " navbar-light");
+    const hoverFxCss = buildHoverFxCss(hoverFx, brandAccentColorEl.value);
 
     const menuHtml = buildMenuHtml(activeOverrideId);
     const rightHtml = buildRightWidgetHtml(theme);
 
-    return `<nav class="${navClasses}" style="background-color: ${bg};">
+    return `${hoverFxCss}<nav class="${navClasses}" style="background-color: ${bg};">
   <div class="${containerClass}">
     ${buildBrandHtml()}
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -1368,12 +1524,12 @@ ${menuHtml}
     const email = siteEmailEl.value.trim();
     const phone = sitePhoneEl.value.trim();
     const socialIcons = [];
-    if (socialFacebookEl.checked) socialIcons.push("bi-facebook");
-    if (socialTwitterEl.checked) socialIcons.push("bi-twitter-x");
-    if (socialLinkedinEl.checked) socialIcons.push("bi-linkedin");
-    if (socialYoutubeEl.checked) socialIcons.push("bi-youtube");
-    const socialHtml = socialIcons.map(ic =>
-      `          <a class="text-black text-decoration-none fw-bold" href="#"><i class="bi ${ic}"></i></a>`
+    if (socialFacebookEl.checked) socialIcons.push(["bi-facebook", socialFacebookUrlEl.value.trim()]);
+    if (socialTwitterEl.checked) socialIcons.push(["bi-twitter-x", socialTwitterUrlEl.value.trim()]);
+    if (socialLinkedinEl.checked) socialIcons.push(["bi-linkedin", socialLinkedinUrlEl.value.trim()]);
+    if (socialYoutubeEl.checked) socialIcons.push(["bi-youtube", socialYoutubeUrlEl.value.trim()]);
+    const socialHtml = socialIcons.map(([ic, url]) =>
+      `          <a class="text-black text-decoration-none fw-bold" href="${escapeHtml(url || "#")}" target="_blank" rel="noopener"><i class="bi ${ic}"></i></a>`
     ).join("\n");
     const contactHtml = customText
       ? `          <span class="fw-bold">${escapeHtml(customText)}</span>`
@@ -1427,12 +1583,12 @@ ${socialHtml}
     ).join("\n");
 
     const socialList = [];
-    if (socialFacebookEl.checked) socialList.push(["Facebook","bi-facebook"]);
-    if (socialTwitterEl.checked) socialList.push(["Twitter / X","bi-twitter-x"]);
-    if (socialLinkedinEl.checked) socialList.push(["LinkedIn","bi-linkedin"]);
-    if (socialYoutubeEl.checked) socialList.push(["YouTube","bi-youtube"]);
-    const socialLinksHtml = socialList.map(([name, ic]) =>
-      `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="#"><i class="bi ${ic} me-1"></i>${name}</a>`
+    if (socialFacebookEl.checked) socialList.push(["Facebook","bi-facebook", socialFacebookUrlEl.value.trim()]);
+    if (socialTwitterEl.checked) socialList.push(["Twitter / X","bi-twitter-x", socialTwitterUrlEl.value.trim()]);
+    if (socialLinkedinEl.checked) socialList.push(["LinkedIn","bi-linkedin", socialLinkedinUrlEl.value.trim()]);
+    if (socialYoutubeEl.checked) socialList.push(["YouTube","bi-youtube", socialYoutubeUrlEl.value.trim()]);
+    const socialLinksHtml = socialList.map(([name, ic, url]) =>
+      `        <a class="text-decoration-none" style="color:${mutedTextColor};" href="${escapeHtml(url || "#")}" target="_blank" rel="noopener"><i class="bi ${ic} me-1"></i>${name}</a>`
     ).join("\n");
 
     return `  <div class="big-footer py-5" style="background-color:${bg};">
@@ -1569,7 +1725,6 @@ ${footerHtml}
   function renderAll(){
     const html = buildNavbarHtml(); // no override -> uses each item's own `.active` flag
     previewMount.innerHTML = html;
-    codeOutput.textContent = html;
     renderDownloadPagesList();
     renderBtnStyleSwatches();
     const addrEl = document.getElementById("browserAddressText");
@@ -1636,6 +1791,7 @@ ${footerHtml}
     renderAll();
   });
   navThemeEl.addEventListener("change", renderAll);
+  navHoverFxEl.addEventListener("change", renderAll);
   brandMainEl.addEventListener("input", renderAll);
   brandAccentEl.addEventListener("input", renderAll);
   brandLinkEl.addEventListener("input", renderAll);
@@ -1669,16 +1825,8 @@ ${footerHtml}
   containerFluidEl.addEventListener("change", renderAll);
 
   // Full page settings just need to refresh the downloadable pages list, not the live navbar preview
-  [topbarCustomTextEl, siteEmailEl, sitePhoneEl, socialFacebookEl, socialTwitterEl, socialLinkedinEl, socialYoutubeEl, footerAboutTextEl, footerCopyrightEl]
+  [topbarCustomTextEl, siteEmailEl, sitePhoneEl, socialFacebookEl, socialTwitterEl, socialLinkedinEl, socialYoutubeEl, socialFacebookUrlEl, socialTwitterUrlEl, socialLinkedinUrlEl, socialYoutubeUrlEl, footerAboutTextEl, footerCopyrightEl]
     .forEach(el => el.addEventListener("input", renderDownloadPagesList));
-
-  document.getElementById("copyCodeBtn").addEventListener("click", () => {
-    navigator.clipboard.writeText(codeOutput.textContent).then(() => {
-      const toast = document.getElementById("copyToast");
-      toast.style.display = "block";
-      setTimeout(() => toast.style.display = "none", 1800);
-    });
-  });
 
   fullscreenBtn.addEventListener("click", () => {
     if (!document.fullscreenElement){
@@ -1710,4 +1858,3 @@ ${footerHtml}
 </script>
 </body>
 </html>
-
