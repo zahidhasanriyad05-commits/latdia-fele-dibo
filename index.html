@@ -674,6 +674,8 @@
             <option value="btn-outline-danger">Outline Danger</option>
             <option value="btn-outline-dark">Outline Dark</option>
           </select>
+          <div class="form-label-sm mt-3">Icon (optional)</div>
+          <div class="icon-picker-grid" id="btnIconPickerWrap"></div>
           <div class="small-note mt-2"><i class="bi bi-magic"></i> Auto-matches your Background Color theme above — pick a Bootstrap color there and this updates to match (you can still change it manually here).</div>
           <div class="small-note mt-1">The button's link also gets its own downloadable page below.</div>
         </div>
@@ -874,6 +876,7 @@
 
   let mode = "multipage"; // "multipage" | "onepage"
   let btnLinkTouched = false; // becomes true once the user manually edits the Button Link field
+  let btnIcon = ""; // icon shown before the Right Side Widget button's text
 
   const QUICK_PAGES = ["Home","About","Services","Portfolio","Blog","Team","Pricing","Gallery","Products","FAQ","Testimonials","Contact"];
 
@@ -995,6 +998,18 @@
       });
       wrap.appendChild(btn);
     });
+  }
+
+  function renderBtnIconPicker(){
+    const wrap = document.getElementById("btnIconPickerWrap");
+    if (!wrap) return;
+    wrap.innerHTML = `<button type="button" class="icon-opt ${btnIcon==='' ? 'selected':''}" data-icon="" title="No icon"><i class="bi bi-slash-circle"></i></button>` +
+      ICONS.map(ic => `<button type="button" class="icon-opt ${btnIcon===ic ? 'selected':''}" data-icon="${ic}" title="${ic}"><i class="bi ${ic}"></i></button>`).join("");
+    wrap.querySelectorAll(".icon-opt").forEach(btn => btn.addEventListener("click", () => {
+      btnIcon = btn.dataset.icon;
+      renderBtnIconPicker();
+      renderAll();
+    }));
   }
 
   // Accordion helper: open exactly one card, close all others
@@ -1377,8 +1392,9 @@ ${dropItems}
     } else if (widgetType === "button"){
       const btnText = btnTextEl.value.trim() || "Button";
       const btnLink = btnLinkEl.value.trim() || "#";
+      const btnIconHtml = btnIcon ? `<i class="bi ${btnIcon} me-1"></i>` : "";
       return `
-      <a class="btn ${btnStyleEl.value} ms-lg-2" href="${escapeHtml(btnLink)}" role="button">${escapeHtml(btnText)}</a>`;
+      <a class="btn ${btnStyleEl.value} ms-lg-2" href="${escapeHtml(btnLink)}" role="button">${btnIconHtml}${escapeHtml(btnText)}</a>`;
     }
     return "";
   }
@@ -1855,6 +1871,7 @@ ${footerHtml}
   renderSwatches();
   renderQuickAdd();
   renderMenuList();
+  renderBtnIconPicker();
   renderAll();
 })();
 </script>
