@@ -1702,12 +1702,14 @@ ${footerHtml}
       return;
     }
     const zip = new JSZip();
-    // JSZip writes each entry's date using UTC getters, but the ZIP format (and your OS)
-    // reads it back as local time — so without compensation, extracted files show a
-    // Modified time shifted by your timezone offset. Correct for that here so the
-    // extracted files show the actual current date/time.
-    const now = new Date();
-    const zipDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    // JSZip writes each entry's date using UTC getters, but the ZIP format (and the OS
+    // that later extracts it) reads it back as plain local time — there's no timezone
+    // stored in a zip. So instead of using the downloader's own device timezone, we fix
+    // the written date to always be Bangladesh time (Asia/Dhaka, UTC+6, no DST), so every
+    // extracted file shows the correct current Bangladesh date & time no matter where
+    // the person downloading it is located.
+    const BD_OFFSET_MS = 6 * 60 * 60 * 1000; // UTC+6, Bangladesh does not observe DST
+    const zipDate = new Date(Date.now() + BD_OFFSET_MS);
     pages.forEach(page => zip.file(pageFilename(page), buildFullPageHtml(page), { date: zipDate }));
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
