@@ -571,7 +571,7 @@
             <span class="browser-dot yellow"></span>
             <span class="browser-dot green"></span>
           </div>
-          <div class="browser-address"><i class="bi bi-lock-fill"></i><span id="browserAddressText">yoursite.com</span></div>
+          <div class="browser-address"><i class="bi bi-lock-fill"></i><span id="browserAddressText">arafat-sir.com</span></div>
         </div>
         <div class="preview-inner" id="previewMount"><style>
       @media (hover: hover) and (pointer: fine){
@@ -751,42 +751,62 @@
       <div class="panel mb-4">
         <div class="panel-title"><i class="bi bi-diagram-3"></i> Navbar Behavior</div>
 
-        <div class="subsection-block mb-3">
-          <div class="subsection-label"><i class="bi bi-diagram-3"></i> Navbar Type</div>
-          <select class="form-select mb-2" id="navMode">
-            <option value="multipage">Multi-page site (index.html, about.html...)</option>
-            <option value="onepage">Landing page / one-page (#home, #about... scroll links)</option>
-          </select>
-          <div class="small-note">Multi-page links each menu to its own page file. Landing page links scroll to a section on the same page.</div>
-        </div>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="subsection-block h-100">
+              <div class="subsection-label"><i class="bi bi-diagram-3"></i> Navbar Type</div>
+              <select class="form-select mb-2" id="navMode">
+                <option value="multipage">Multi-page site (index.html, about.html...)</option>
+                <option value="onepage">Landing page / one-page (#home, #about... scroll links)</option>
+              </select>
+              <div class="small-note">Multi-page links each menu to its own page file. Landing page links scroll to a section on the same page.</div>
+            </div>
+          </div>
 
-        <div class="subsection-block mb-3">
-          <div class="subsection-label"><i class="bi bi-cursor"></i> Menu Hover Effect</div>
-          <select class="form-select" id="navHoverFx">
-            <option value="none">None (Default)</option>
-            <option value="underline-slide" selected="">Underline — Slide In (Left to Right)</option>
-            <option value="underline-center">Underline — Grow from Center</option>
-            <option value="underline-fade">Underline — Fade In</option>
-            <option value="underline-double">Underline — Double Line</option>
-            <option value="bg-fill">Background — Solid Fill</option>
-            <option value="bg-fade">Background — Soft Fade</option>
-            <option value="text-accent">Text Color — Shift to Accent</option>
-            <option value="scale-up">Scale Up</option>
-            <option value="lift-up">Lift Up (Float)</option>
-            <option value="letter-spacing">Letter Spacing Expand</option>
-            <option value="glow">Text Glow</option>
-            <option value="border-box">Border Box Outline</option>
-            <option value="dot-indicator">Bottom Dot Indicator</option>
-            <option value="skew">Slight Skew</option>
-          </select>
-          <div class="small-note mt-2"><i class="bi bi-magic"></i> Hover over a menu item in the Live Preview above to see it. Uses your Accent Text color as the effect color.</div>
-        </div>
+          <div class="col-md-4">
+            <div class="subsection-block h-100">
+              <div class="subsection-label"><i class="bi bi-cursor"></i> Menu Hover Effect</div>
+              <select class="form-select" id="navHoverFx">
+                <option value="none">None (Default)</option>
+                <option value="underline-slide" selected="">Underline — Slide In (Left to Right)</option>
+                <option value="underline-center">Underline — Grow from Center</option>
+                <option value="underline-fade">Underline — Fade In</option>
+                <option value="underline-double">Underline — Double Line</option>
+                <option value="bg-fill">Background — Solid Fill</option>
+                <option value="bg-fade">Background — Soft Fade</option>
+                <option value="text-accent">Text Color — Shift to Accent</option>
+                <option value="scale-up">Scale Up</option>
+                <option value="lift-up">Lift Up (Float)</option>
+                <option value="letter-spacing">Letter Spacing Expand</option>
+                <option value="glow">Text Glow</option>
+                <option value="border-box">Border Box Outline</option>
+                <option value="dot-indicator">Bottom Dot Indicator</option>
+                <option value="skew">Slight Skew</option>
+              </select>
+              <div class="small-note mt-2"><i class="bi bi-magic"></i> Hover over a menu item in the Live Preview above to see it. Uses your Accent Text color as the effect color.</div>
+            </div>
+          </div>
 
-        <div class="subsection-block">
-          <div class="subsection-label"><i class="bi bi-lightning-charge"></i> Quick Add Common Pages</div>
-          <div class="d-flex flex-wrap gap-2" id="quickAddWrap"><button type="button" class="btn btn-sm btn-outline-secondary">Home</button><button type="button" class="btn btn-sm btn-outline-secondary">About</button><button type="button" class="btn btn-sm btn-outline-secondary">Services</button><button type="button" class="btn btn-sm btn-outline-secondary">Portfolio</button><button type="button" class="btn btn-sm btn-outline-secondary">Blog</button><button type="button" class="btn btn-sm btn-outline-secondary">Team</button><button type="button" class="btn btn-sm btn-outline-secondary">Pricing</button><button type="button" class="btn btn-sm btn-outline-secondary">Gallery</button><button type="button" class="btn btn-sm btn-outline-secondary">Products</button><button type="button" class="btn btn-sm btn-outline-secondary">FAQ</button><button type="button" class="btn btn-sm btn-outline-secondary">Testimonials</button><button type="button" class="btn btn-sm btn-outline-secondary">Contact</button></div>
-          <div class="small-note mt-2">Click to add — name and link fill in automatically, and you can still edit them afterward.</div>
+          <div class="col-md-4">
+            <div class="subsection-block h-100">
+              <div class="subsection-label"><i class="bi bi-rulers"></i> Layout Options</div>
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" role="switch" id="stickyTop" checked="">
+                <label class="form-check-label" for="stickyTop">Keep navbar fixed at top on scroll (sticky-top)</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="containerFluid" checked="">
+                <label class="form-check-label" for="containerFluid">Full-width layout (container-fluid)</label>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div class="panel mb-4">
+        <div class="panel-title"><i class="bi bi-lightning-charge"></i> Quick Add Common Pages</div>
+        <div class="d-flex flex-wrap gap-2" id="quickAddWrap"><button type="button" class="btn btn-sm btn-outline-secondary">Home</button><button type="button" class="btn btn-sm btn-outline-secondary">About</button><button type="button" class="btn btn-sm btn-outline-secondary">Services</button><button type="button" class="btn btn-sm btn-outline-secondary">Portfolio</button><button type="button" class="btn btn-sm btn-outline-secondary">Blog</button><button type="button" class="btn btn-sm btn-outline-secondary">Team</button><button type="button" class="btn btn-sm btn-outline-secondary">Pricing</button><button type="button" class="btn btn-sm btn-outline-secondary">Gallery</button><button type="button" class="btn btn-sm btn-outline-secondary">Products</button><button type="button" class="btn btn-sm btn-outline-secondary">FAQ</button><button type="button" class="btn btn-sm btn-outline-secondary">Testimonials</button><button type="button" class="btn btn-sm btn-outline-secondary">Contact</button></div>
+        <div class="small-note mt-2">Click to add — name and link fill in automatically, and you can still edit them afterward.</div>
       </div>
 
       <div class="panel mb-4">
@@ -1152,18 +1172,6 @@
             </select>
             <div class="small-note mt-2"><i class="bi bi-magic"></i> Whichever background you pick, the readable text color is chosen automatically (contrast rule) — you can still override it manually here if needed.</div>
           </div>
-        </div>
-      </div>
-
-      <div class="panel mb-4">
-        <div class="panel-title"><i class="bi bi-rulers"></i> Layout Options</div>
-        <div class="form-check form-switch mb-2">
-          <input class="form-check-input" type="checkbox" role="switch" id="stickyTop">
-          <label class="form-check-label" for="stickyTop">Keep navbar fixed at top on scroll (sticky-top)</label>
-        </div>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="containerFluid" checked="">
-          <label class="form-check-label" for="containerFluid">Full-width layout (container-fluid)</label>
         </div>
       </div>
 
@@ -2346,7 +2354,7 @@ ${bottomScripts}
     const addrEl = document.getElementById("browserAddressText");
     if (addrEl){
       const link = brandLinkEl.value.trim();
-      addrEl.textContent = (!link || link === "#" || link === "index.html") ? "yoursite.com" : "yoursite.com/" + link.replace(/^#\/?/, "");
+      addrEl.textContent = (!link || link === "#" || link === "index.html") ? "arafat-sir.com" : "arafat-sir.com/" + link.replace(/^#\/?/, "");
     }
   }
 
